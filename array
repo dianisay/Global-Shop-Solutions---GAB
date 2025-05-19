@@ -1,0 +1,32 @@
+Program.Sub.Main.Start
+
+    ' Step 1: Declare the array variable (change type as needed: String, Float, Long, etc.)
+    V.Local.<ArrayName>.Declare(<DataType>)
+
+    ' Step 2: Resize the array with desired bounds (e.g., 0 to 10)
+    V.Local.<ArrayName>.Redim(<LowerBound>, <UpperBound>)
+
+    ' Step 3: Optionally set values manually
+    V.Local.<ArrayName>(0).set("<Value1>")
+    V.Local.<ArrayName>(1).set("<Value2>")
+    ' ... add more as needed
+
+    ' OR Step 3 (Alternative): Populate array using Split
+    V.Local.<SourceString>.Declare(String)
+    V.Local.<SourceString>.set("<CommaSeparatedValues>")
+    Function.Intrinsic.String.Split(V.Local.<SourceString>, ",", V.Local.<ArrayName>)
+
+    ' Step 4: Declare a loop counter
+    V.Local.<CounterVar>.Declare(Long)
+
+    ' Step 5: Loop through the array using LBound and UBound
+    F.Intrinsic.Control.For(V.Local.<CounterVar>, V.Local.<ArrayName>.LBound, V.Local.<ArrayName>.UBound, 1)
+
+        ' Step 6: Process each array element
+        ' Example: Display the value
+        Function.Intrinsic.UI.Msgbox(V.Local.<ArrayName>(V.Local.<CounterVar>))
+
+    ' Step 7: End the loop
+    F.Intrinsic.Control.Next(V.Local.<CounterVar>)
+
+Program.Sub.Main.End
