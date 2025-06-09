@@ -1,0 +1,209 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.F_Main..Create(BaseForm)
+Gui.F_Main..Caption("GAB 101")
+Gui.F_Main..Size(528,120)
+Gui.F_Main..MinX(0)
+Gui.F_Main..MinY(0)
+Gui.F_Main..Position(0,0)
+Gui.F_Main..AlwaysOnTop(False)
+Gui.F_Main..FontName("Tahoma")
+Gui.F_Main..FontSize(8.25)
+Gui.F_Main..ControlBox(True)
+Gui.F_Main..MaxButton(True)
+Gui.F_Main..MinButton(True)
+Gui.F_Main..MousePointer(0)
+Gui.F_Main..Moveable(True)
+Gui.F_Main..Sizeable(True)
+Gui.F_Main..ShowInTaskBar(True)
+Gui.F_Main..TitleBar(True)
+Gui.F_Main..Event(UnLoad,F_Main_UnLoad)
+Gui.F_Main.txtTextBox.Create(TextBox,"",True,100,20,0,16,34,True,0,"Tahoma",8.25,,1)
+Gui.F_Main.ddlDropdownList.Create(DropDownList)
+Gui.F_Main.ddlDropdownList.Enabled(True)
+Gui.F_Main.ddlDropdownList.Visible(True)
+Gui.F_Main.ddlDropdownList.Zorder(0)
+Gui.F_Main.ddlDropdownList.Size(117,20)
+Gui.F_Main.ddlDropdownList.Position(136,34)
+Gui.F_Main.ddlDropdownList.FontName("Tahoma")
+Gui.F_Main.ddlDropdownList.FontSize(8.25)
+Gui.F_Main.dtpDatePicker.Create(DatePicker)
+Gui.F_Main.dtpDatePicker.Enabled(True)
+Gui.F_Main.dtpDatePicker.Visible(True)
+Gui.F_Main.dtpDatePicker.Zorder(0)
+Gui.F_Main.dtpDatePicker.Size(100,20)
+Gui.F_Main.dtpDatePicker.Position(283,33)
+Gui.F_Main.dtpDatePicker.CheckBox(False)
+Gui.F_Main.dtpDatePicker.FontName("Tahoma")
+Gui.F_Main.dtpDatePicker.FontSize(8.25)
+Gui.F_Main.cmdButton.Create(Button)
+Gui.F_Main.cmdButton.Enabled(True)
+Gui.F_Main.cmdButton.Visible(True)
+Gui.F_Main.cmdButton.Zorder(0)
+Gui.F_Main.cmdButton.Size(89,32)
+Gui.F_Main.cmdButton.Position(420,19)
+Gui.F_Main.cmdButton.Caption("Click Me!")
+Gui.F_Main.cmdButton.FontName("Tahoma")
+Gui.F_Main.cmdButton.FontSize(12)
+Gui.F_Main.cmdButton.FontStyle(True,False,False,False,False)
+Gui.F_Main.cmdButton.Event(Click,cmdButton_Click)
+Gui.F_Main.lblTextBox.Create(Label,"Text Box",True,74,19,0,16,11,True,0,"Tahoma",12,,0,0)
+Gui.F_Main.lblTextBox.BorderStyle(0)
+Gui.F_Main.lblTextBox.FontStyle(True,False,False,False,False)
+Gui.F_Main.lblDropdownList.Create(Label,"Dropdown List",True,117,19,0,136,11,True,0,"Tahoma",12,,0,0)
+Gui.F_Main.lblDropdownList.BorderStyle(0)
+Gui.F_Main.lblDropdownList.FontStyle(True,False,False,False,False)
+Gui.F_Main.lblDatePicker.Create(Label,"Date Picker",True,95,19,0,283,10,True,0,"Tahoma",12,,0,0)
+Gui.F_Main.lblDatePicker.BorderStyle(0)
+Gui.F_Main.lblDatePicker.FontStyle(True,False,False,False,False)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+V.Global.sString.Declare
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+
+#Region "Variables"
+'User created variables
+Variable.Local.String.Declare("String","Hello")
+V.Local.sString2.Declare
+V.Local.iLong.Declare
+V.Local.fFloat.Declare
+V.Local.bBoolean.Declare
+V.Local.dDate.Declare
+V.Local.iCnt.Declare
+V.Local.sMsg.Declare
+V.Local.bCheck.Declare
+V.Local.sSQL.Declare
+
+'Built in variables
+'V.Ambient.NewLine
+'F.Intrinsic.String.Build("Hello{0}World!",V.Ambient.NewLine,V.Local.sMsg)
+'F.Intrinsic.UI.Msgbox(V.Local.sMsg,"Built-in Variables")
+'V.Caller.User
+'V.Passed.000001
+'V.Screen
+'V.ODBC.
+'V.Args
+'F.Intrinsic.Control.CallSub(NewSub,"MESSAGE",V.Local.sMsg)
+'V.Color.
+'V.Enum.ThemeColors!ColorGreen.
+'V.Local.sMsg.Set(V.ASCII.38)
+'V.DataTable
+'V.DataView
+'V.Dictionary
+'V.Enum.ConditionalOperations!
+'V.System.UserName
+
+#End Region ' Variables
+
+'Function.
+	'F.Automation - MS Office, etc.
+	'F.Communication - FTP/SFTP
+	'F.Data - DataTable, etc
+	'F.Global. - Callwrappers, BI, etc
+	'F.Image - images
+
+'Gui.
+'Program.
+
+'F.Intrinsic.Control.If(V.Caller.Hook,=,10120) ' Inventory Screen Populate
+'	V.Passed.000068.Set("GAB 101")
+'F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,10210) ' Inventory Screen Script 1
+'	F.Intrinsic.Math.Add(V.Passed.000017,125,V.Passed.000017)
+'F.Intrinsic.Control.Else
+'	F.Intrinsic.Control.End
+'F.Intrinsic.Control.EndIf
+
+'For Loop long version
+'F.Intrinsic.Control.For(V.Local.iCnt,0,20,1)
+'	F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Local.iCnt,V.Ambient.NewLine,V.Local.sMsg)
+'F.Intrinsic.Control.Next(V.Local.iCnt)
+
+'V.Local.sMsg.Redim(0,0)
+
+''For Loop short version
+'F.Intrinsic.Control.For(V.Local.iCnt,20)
+'	F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Local.iCnt,V.Ambient.NewLine,V.Local.sMsg)
+'F.Intrinsic.Control.Next(V.Local.iCnt)
+
+'Do Until Loop
+'F.Intrinsic.Control.DoUntil(V.Local.bCheck,=,True)
+'	F.Intrinsic.Control.If(V.Local.iCnt,=,20)
+'		V.Local.bCheck.Set(True)
+'	F.Intrinsic.Control.Else
+'		F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Local.iCnt,V.Ambient.NewLine,V.Local.sMsg)
+'	F.Intrinsic.Control.EndIf
+'	F.Intrinsic.Math.Add(V.Local.iCnt,1,V.Local.iCnt)
+'F.Intrinsic.Control.Loop
+
+'F.Intrinsic.UI.Msgbox(V.Local.sMsg)
+
+'F.Intrinsic.Control.CallSub(NewSub)
+
+Gui.F_Main.ddlDropdownList.AddItem("Item 1",0)
+Gui.F_Main.ddlDropdownList.AddItem("Item 2",1)
+Gui.F_Main.ddlDropdownList.AddItem("Item 3",2)
+Gui.F_Main.ddlDropdownList.AddItem("Item 4",3)
+Gui.F_Main.ddlDropdownList.AddItem("Item 5",4)
+
+Gui.F_Main.txtTextBox.Text("Something")
+
+Gui.F_Main..Show
+
+Program.Sub.Main.End
+
+Program.Sub.NewSub.Start
+'V.Local.sArgument.Declare
+V.Local.sSQL.Declare
+V.Local.iCnt.Declare
+V.Local.sMsg.Declare
+V.Local.sRowSplit.Declare
+
+'V.Local.sArgument.Set(V.Args.MESSAGE)
+
+F.ODBC.Connection!con.OpenCompanyConnection
+	F.ODBC.Connection!con.ExecuteAndReturn("Select top 10 PART,LOCATION from V_INVENTORY_MSTR order by PART desc",V.Local.sSql)
+F.ODBC.Connection!con.Close
+
+'*!* = Inner delimiter
+'#$# = Outer delimiter
+
+F.Intrinsic.String.Split(V.Local.sSQL,"#$#",V.Local.sSQL)
+
+F.Intrinsic.String.Join(V.Local.sSQL,"#$#",V.Local.sSQL)
+
+'V.Local.sSQL.RedimPreserve(0,0)
+
+
+F.Intrinsic.Control.For(V.Local.iCnt,V.Local.sSQL.UBound)
+	F.Intrinsic.String.Split(V.Local.sSQL(V.Local.iCnt),"*!*",V.Local.sRowSplit)
+	F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Local.sRowSplit(0),V.Ambient.NewLine,V.Local.sMsg)
+F.Intrinsic.Control.Next(V.Local.iCnt)
+
+F.Intrinsic.UI.Msgbox(V.Local.sMsg)
+
+Program.Sub.NewSub.End
+
+Program.Sub.cmdButton_Click.Start
+V.Local.sMsg.Declare
+'V.Local.sDate.Declare
+
+F.Intrinsic.String.Format(V.Screen.F_Main!dtpDatePicker.Value,"YYYY-MM-DD",V.Local.sMsg)
+
+'V.Local.sMsg.Set(V.Screen.F_Main!dtpDatePicker.Value)
+
+F.Intrinsic.UI.Msgbox(V.Local.sMsg)
+
+Program.Sub.cmdButton_Click.End
+
+Program.Sub.F_Main_UnLoad.Start
+F.Intrinsic.Control.End
+Program.Sub.F_Main_UnLoad.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9133.25878$}$1
+${$6$}$tsmith$}$20250310135838007$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcB5FDSV2G6BmBaYew4ntg5LXqsPqLKvcoo=
+${$7$}$File Version:1.1.20250310185838.0
+Program.Sub.Comments.End

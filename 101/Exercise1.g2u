@@ -1,0 +1,17 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'GAB training
+'Exercise 1
+
+'Update this program to display "Hello [User]" where [User] is the 8 character username of the current Global Shop user.
+
+F.intrinsic.UI.MsgBox("Hello world","First GAB Script")
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$tsmith$}$20240320074721714$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXOEUcJ6Psb2Wh9YERerl1wxx7OUUg3W7Tis37D8tzKjY=
+Program.Sub.Comments.End

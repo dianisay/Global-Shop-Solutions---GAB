@@ -1,0 +1,22 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'GAB training
+'Exercise 3
+
+V.Local.fPerVal.Declare
+
+'Edit the script to write back to the Alt Price fields as so: Alt Price 2 back to it self at 5% increase, Alt Price 3 10% decrease, Alt Price 4 25% decrease
+F.Intrinsic.Control.If(V.Caller.Hook,=,10210)
+	'Alt Price 2 - 000054
+	'Alt Price 3 - 000055
+	'Alt Price 4 - 000056
+F.Intrinsic.Control.EndIf
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$tsmith$}$20211220093019141$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tX8psxATUoQz9Bh9iZBZP42Ok+oaDYnIrcsOHYWuSavjE=
+Program.Sub.Comments.End

@@ -1,0 +1,76 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.F_Example..Create(BaseForm)
+Gui.F_Example..Caption("Form")
+Gui.F_Example..Size(1067,351)
+Gui.F_Example..MinX(0)
+Gui.F_Example..MinY(0)
+Gui.F_Example..Position(0,0)
+Gui.F_Example..AlwaysOnTop(False)
+Gui.F_Example..FontName("Tahoma")
+Gui.F_Example..FontSize(8.25)
+Gui.F_Example..ControlBox(True)
+Gui.F_Example..MaxButton(False)
+Gui.F_Example..MinButton(True)
+Gui.F_Example..MousePointer(0)
+Gui.F_Example..Moveable(True)
+Gui.F_Example..Sizeable(False)
+Gui.F_Example..ShowInTaskBar(True)
+Gui.F_Example..TitleBar(True)
+Gui.F_Example..Event(UnLoad,F_Example_UnLoad)
+Gui.F_Example.txtExample.Create(TextBox,"",True,100,20,0,33,36,True,0,"Tahoma",8.25,,1)
+Gui.F_Example.lblTextbox.Create(Label,"Textbox",True,40,13,0,37,21,True,0,"Tahoma",8.25,,0,0)
+Gui.F_Example.lblTextbox.BorderStyle(0)
+Gui.F_Example.chkExample.Create(CheckBox)
+Gui.F_Example.chkExample.Enabled(True)
+Gui.F_Example.chkExample.Visible(True)
+Gui.F_Example.chkExample.Zorder(0)
+Gui.F_Example.chkExample.Size(75,20)
+Gui.F_Example.chkExample.Position(161,36)
+Gui.F_Example.chkExample.Caption("Check Box")
+Gui.F_Example.chkExample.FontName("Tahoma")
+Gui.F_Example.chkExample.FontSize(8.25)
+Gui.F_Example.dtpExample.Create(DatePicker)
+Gui.F_Example.dtpExample.Enabled(True)
+Gui.F_Example.dtpExample.Visible(True)
+Gui.F_Example.dtpExample.Zorder(0)
+Gui.F_Example.dtpExample.Size(100,20)
+Gui.F_Example.dtpExample.Position(256,36)
+Gui.F_Example.dtpExample.CheckBox(False)
+Gui.F_Example.dtpExample.FontName("Tahoma")
+Gui.F_Example.dtpExample.FontSize(8.25)
+Gui.F_Example.lblDatePicker.Create(Label,"Date Picker",True,54,13,0,260,21,True,0,"Tahoma",8.25,,0,0)
+Gui.F_Example.lblDatePicker.BorderStyle(0)
+Gui.F_Example.ddlDropDownList.Create(DropDownList)
+Gui.F_Example.ddlDropDownList.Enabled(True)
+Gui.F_Example.ddlDropDownList.Visible(True)
+Gui.F_Example.ddlDropDownList.Zorder(0)
+Gui.F_Example.ddlDropDownList.Size(120,20)
+Gui.F_Example.ddlDropDownList.Position(34,95)
+Gui.F_Example.ddlDropDownList.FontName("Tahoma")
+Gui.F_Example.ddlDropDownList.FontSize(8.25)
+Gui.F_Example.lblDropDownList.Create(Label,"Drop Down List",True,72,13,0,39,80,True,0,"Tahoma",8.25,,0,0)
+Gui.F_Example.lblDropDownList.BorderStyle(0)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+'GAB Training
+'Exercise 5
+
+'Edit this script so that the Drop Down List is created with 5 values added to it with the Drop Down List selected with List Index 3 when the form initially opens
+
+Gui.F_Example..Show
+
+Program.Sub.Main.End
+
+Program.Sub.F_Example_UnLoad.Start
+F.Intrinsic.Control.End
+Program.Sub.F_Example_UnLoad.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.8413.19752$}$1
+${$6$}$tsmith$}$20230209073355056$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXACdi5Oc2hcJjcm7neOyvc2ICmcnl3zGCHGPsIGscEng=
+Program.Sub.Comments.End
