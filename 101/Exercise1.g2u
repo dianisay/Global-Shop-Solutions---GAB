@@ -7,7 +7,11 @@ Program.Sub.Main.Start
 
 'Update this program to display "Hello [User]" where [User] is the 8 character username of the current Global Shop user.
 
-F.intrinsic.UI.MsgBox("Hello world","First GAB Script")
+V.Local.sMsg.Declare
+F.Intrinsic.String.Build("Hello {0}", V.System.UserName, V.Local.sMsg)
+F.Intrinsic.UI.MsgBox(V.Local.sMsg, "First GAB Script")
+
+'F.intrinsic.UI.MsgBox("Hello world","First GAB Script")
 
 Program.Sub.Main.End
 
