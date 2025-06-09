@@ -1,21 +1,30 @@
-﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.Start
 Program.Sub.Preflight.End
 
+
+'This marks the beginning of the main part of the program.
 Program.Sub.Main.Start
 'GAB training
 'Exercise 1
 
 'Update this program to display "Hello [User]" where [User] is the 8 character username of the current Global Shop user.
 
-V.Local.sMsg.Declare
-F.Intrinsic.String.Build("Hello {0}", V.System.UserName, V.Local.sMsg)
-F.Intrinsic.UI.MsgBox(V.Local.sMsg, "First GAB Script")
 
-'F.intrinsic.UI.MsgBox("Hello world","First GAB Script")
+V.Local.sMsg.Declare  'This creates a variable called sMsg to store a message. 
+F.Intrinsic.String.Build("Hello {0}", V.System.UserName, V.Local.sMsg) 'This line builds the message.
+
+	'"Hello {0}" is a template. {0} is a placeholder.
+	'V.System.UserName gets the current user's name.
+	'The result (like "Hello jdoe1234") is stored in sMsg.  sMsg = "Hello {x}" donde x = UserName
+
+F.Intrinsic.UI.MsgBox(V.Local.sMsg, "First GAB Script") 'This shows a pop-up message box with the message we just built. The title of the box is "First GAB Script".
+
+F.intrinsic.UI.MsgBox("Hello world","First GAB Script")
 
 Program.Sub.Main.End
 
 Program.Sub.Comments.Start
-${$5$}$2.0.0.0$}$2
-${$6$}$tsmith$}$20240320074721714$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXOEUcJ6Psb2Wh9YERerl1wxx7OUUg3W7Tis37D8tzKjY=
+${$5$}$23.1.9243.18408$}$1
+${$6$}$droldan$}$20250609174944883$}$B2femnEqbLfZe6KOMlAUIUDbLEceswGWHv6wtu8ZCLJjtiYeVypp8LBCEQtITCscnHhKek2Cg6Q=
+${$7$}$File Version:1.1.20250609224944.1
 Program.Sub.Comments.End
