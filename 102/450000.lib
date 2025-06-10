@@ -1,0 +1,74 @@
+'This library helps with the use of the 450000 Call wrapper, Work Order Query (WOQUERY). To use it, simply fill out the 450000 datatable with the data for a single call to the call wrapper for each row.
+'Then call either 450000Sync or 450000Async to have the call wrapper run on each row.
+'The datatable is structed as follows:
+'Column		=	Parameter				=	Possible Values
+'================================================================================================================
+'Mode		=	Mode					=	1 select work order 
+'										=	2 chose work order by customer 
+'										=	3 chose work order by PO 
+'										=	4 chose work order by user code 
+'										=	5 chose work order by work order description 
+'										=	6 chose work order by part 
+'										=	7 show specific work order 
+'										=	8 show specific work order without cost 
+'										=	9 show specific work order without labor dollars
+'WONum		=	Work Order Number		=	######
+'WOSuffix	=	Work Order Suffix		=	###
+'ActOrHist	=	Active/History Switch	=	"A" - Active
+'										=	"H" - History
+'================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s450000Error.Declare(String)
+F.Data.DataTable.Create("450000",True)
+F.Data.DataTable.AddColumn("450000","Mode","String")
+F.Data.DataTable.AddColumn("450000","WONum","String")
+F.Data.DataTable.AddColumn("450000","WOSuffix","String")
+F.Data.DataTable.AddColumn("450000","ActOrHist","String")
+Program.Sub.Preflight.End
+
+Program.Sub.450000.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	
+	'For each row in the datatable: concat needed parameters then call the callwrapper according to how the programmer called
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.450000.RowCount--,1)
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.450000(V.Local.iCount).Mode!FieldVal,V.DataTable.450000(V.Local.iCount).WONum!FieldVal,V.DataTable.450000(V.Local.iCount).WOSuffix!FieldVal,V.DataTable.450000(V.Local.iCount).ActOrHist!FieldVal,V.Local.sParams)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(450000,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(450000,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("450000")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError450000,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.450000.End
+
+'Calls 450000 with callwrapper type of 0. Passes existance of Test argument if it is provided.
+Program.Sub.450000Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(450000,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError450000, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.450000Sync.End
+
+'Calls 450000 with callwrapper type of 1. Passes existance of Test argument if it is provided.
+Program.Sub.450000Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(450000,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError450000, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.450000Async.End
+
+Program.Sub.CatchError450000.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s450000Error)
+Program.Sub.CatchError450000.End

@@ -1,0 +1,25 @@
+﻿Program.Sub.Preflight.Start
+Program.External.Include.Library("450000.lib")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+
+'F.Data.DataTable.AddRow("450000","MODE",7,"WONum","001112","WOSuffix","001","ActOrHist","A")
+'F.Intrinsic.Control.CallSub(450000Sync)
+
+'F.Global.General.CallWrapperSync(450000,"7!*!001112!*!001!*!A")
+
+'F.Global.General.CallWrapperSync(900100,"001112!*!001!*!001811")
+
+F.Global.General.CallWrapperSyncBIO(900100,"001112!*!001!*!001811")
+
+
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9133.25878$}$1
+${$6$}$tsmith$}$20250311134106905$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcDe1xT+mZrH56av3nsyMc8cjTVYSf6K8lM=
+${$7$}$File Version:1.1.20250311184106.0
+Program.Sub.Comments.End

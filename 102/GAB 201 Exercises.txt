@@ -1,0 +1,31 @@
+Exercise 1:
+Create Table in Pervasive or Zen:
+Table name should be GCG_CUSTOM_TABLE
+	PART
+	LOC
+	PUSER1
+	PUSER2
+	
+Exercise 2
+Using GAB, insert a row to the GCG_CUSTOM_TABLE with values for all fields
+
+Exercise 3
+Create a DataTable using SQL to pull Customer Data
+Customer Master (note view vs table in database)
+	Customer number
+	Customer name
+	City
+	State
+	Zip
+	
+Exercise 4
+Add a new field called PUSER3 (Char (30)) to GCG_CUSTOM_TABLE
+Right-click and select “Edit” in PCC/ZEN
+Using GAB, fill PUSER3 from INVENTORY_MSTR.WHO_CHG_LAST
+
+Exercise 5
+Moved to Session 3 (GAB 301)
+
+Exercise 6
+Write a GAB program that, when executed, opens a sales order of your choice to view.  The use of a library is optional.
+
