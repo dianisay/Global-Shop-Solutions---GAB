@@ -1,0 +1,47 @@
+'This library helps with the use of the 1500 Call wrapper, Reprice Routers (RE0071CW). To use it, simply fill out the 1500 datatable with the router and quantity for each row of the input file.
+'Then call either 1500Sync or 1500Async to have the library create the input file and run the callwrapper to generate the output file. V.Global.s1500InputFile and V.Global.s1500OutputFile can
+'be set if you need to set the input and output files, however they default to F.Intrinsic.String.Build("{0}\{1}{2}PRICING.IN",V.Caller.FilesDir,V.Caller.User.Trim,V.Caller.Terminal,V.Global.s1500InputFile)
+'and F.Intrinsic.String.Build("{0}\{1}{2}PRICING.OUT",V.Caller.FilesDir,V.Caller.User.Trim,V.Caller.Terminal,V.Global.s1500OutputFile) if you don't set them yourself.
+'The datatable is structed as follows:
+'Column		=	Parameter				=	Possible Values
+'================================================================================================================
+'Router		=	Router for input file	=	Router
+'Quantity	=	quantity for input file	=	Float
+'================================================================================================================
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.1500Validate.Start
+F.Intrinsic.Control.Try
+	V.Local.sOutFile.Declare(String)
+	V.Local.sInFile.Declare(String)
+	V.Local.sInFileContent.Declare(String)
+	
+	'Check to see if this was called by Manual Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,<>,"M")
+		'Add test data
+		F.Data.DataTable.AddRow("1500","Router","0025","Quantity","3")
+		F.Data.DataTable.AddRow("1500","Router","210900","Quantity","2")
+		F.Data.DataTable.AddRow("1500","Router","JST3000","Quantity","1.5")
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O")
+		F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed.Not)
+		F.Intrinsic.Control.CallSub(1500Sync)
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1500Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.1500Validate.End
+
+Program.Sub.CatchError1500Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 1500Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError1500Validate.End

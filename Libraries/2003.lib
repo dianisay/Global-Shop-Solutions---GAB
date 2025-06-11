@@ -1,0 +1,210 @@
+﻿'2003 Lib can be used to ease the process of calling the 2003 call wrapper for WIP to Finished Goods (JB0052GI). This emulates going through Shop Floor Control > Transactions > WIP To Finished Goods.
+'When using mode "NS" it is possible to use a file to WIP to FG to specific lot/bin/heat/serial numbers.
+'You don't have to worry about setting up a file in this case. There are 2 datatables to fill out, 2003 and 2003File. Each row in the 2003 datatable represents one call to the 2003 call wrapper.
+'Each row in the 2003File datatable represents a row in the file portion of the upload when mode = NS. The two tables are linked on the Work Order and suffix, so if you need to add multiple rows to the file
+'for a single item in the 2003 datatable just add multiple rows to the 2003File datatable with the same work order and suffix as the row in the 2003 datatable.
+
+'*****IMPORTANT******
+'The File for callwrapper 2003 is used for Lot\Bin records only. Because of how the CORE program utilizes the File you will not be able to mix lot\bin parts with non-lot\bin parts.
+'*****IMPORTANT******
+
+'Call wrapper documentation: http://www.gss-updates.com/site/gabhelpen/function_global_general_callwrapperasync.htm?zoom_highlightsub=callwrapper
+
+'2003 Datatable paremeters are as follows. Unless otherwise noted, each line defaults to an empty string if not entered
+'Company Code - Defaults to logged in company code if not entered
+'Terminal - Defaults to logged in terminal if not entered
+'Calling Program - Defaults to V.Caller.Caller if not entered
+'Mode - - Default to screenless mode if none enetered
+'	"NS": Screenless Mode
+'	"OS": Open screen Mode
+'Pass Detail Job^
+'Pass Detail Suffix^
+'Pass Detail Sequence
+'Pass Detail Fill^
+'Pass Detail Date^
+'Pass Detail Key Sequence^
+'Workorder*
+'Workorder Suffix*
+'Transfer Date Year*#
+'Transfer Date Month*#
+'Transfer Date Date*#
+'Close Workorder Flag* (Y or N)
+'	"Y": Close work order
+'	"N": Do not close work order
+'Part Description*#
+'Quantity*
+'Cost*
+'Price*
+'Print Labels Flag* (Y or N)
+'	"Y": Print labels
+'	"N": Do not print labels
+''Cost Method*
+'	"E": Estimate
+'	"P": Percentage
+'	"I": Inventory
+'	"L": Alt Cost
+'	"A": Actual
+'	"R": Remaining
+'	"U": Entered
+'Update Inventory Flag* (Y or N)
+'	"Y": Update inventory
+'	"N": Do not update inventory
+'Inventory Debit Account*
+'
+'If any of the columns are blank, they are assumed to be empty. A valid or empty bin is required.
+'^ indicates that this parameter is only used when no mode is specified.
+'* indicates that this parameter is only used in screenless mode.
+'# indicates that this parameter is optional. If blank, it will be set to its default value.
+'The 2003File datatable is structured as follows.
+'WONum
+'WOSuffix
+'Lot
+'Bin
+'Heat
+'Serial
+'Specific Quantity - All rows in this table for a work order + suffix identifier must have their specific quantities sum to the 2003 datatables quantity for the work order + suffix
+'Expiration Date
+'Warranty Months
+'User Field 1
+'User Field 2
+'User Field 3
+'User Field 4
+'User Field 5
+'User Field 6
+'User Field 7
+'User Field 8
+'User Field 9
+' 
+'Other notes:
+'If screenless mode is on, all error messages will be suppressed. If an error occurs, the text from the error message will be passed back as a parameter and can be accessed via Variable.Ambient.CallWrapperReturn.
+'Call Wrapper types:
+'0 - CallwrapperSync (Default)
+'1 - CallwrapperAsync
+Program.Sub.Preflight.Start
+V.Global.s2003Error.Declare(String)
+F.Data.DataTable.Create("2003",True)
+F.Data.DataTable.AddColumn("2003","CompanyCode","String",V.Caller.CompanyCode)
+F.Data.DataTable.AddColumn("2003","Terminal","String",V.Caller.Terminal)
+F.Data.DataTable.AddColumn("2003","Program","String",V.Caller.Caller)
+F.Data.DataTable.AddColumn("2003","Mode","String","NS")
+F.Data.DataTable.AddColumn("2003","PassDetailJob","String","")
+F.Data.DataTable.AddColumn("2003","PassDetailSuffix","String","")
+F.Data.DataTable.AddColumn("2003","PassDetailSequence","String","")
+F.Data.DataTable.AddColumn("2003","PassDetailFill","String","")
+F.Data.DataTable.AddColumn("2003","PassDetailDate","String","")
+F.Data.DataTable.AddColumn("2003","PassDetailKeySeq","String","")
+F.Data.DataTable.AddColumn("2003","WONum","String","")
+F.Data.DataTable.AddColumn("2003","WOSuffix","String","")
+F.Data.DataTable.AddColumn("2003","XferYear","String","")
+F.Data.DataTable.AddColumn("2003","XferMonth","String","")
+F.Data.DataTable.AddColumn("2003","XferDay","String","")
+F.Data.DataTable.AddColumn("2003","CloseWO","String","")
+F.Data.DataTable.AddColumn("2003","PartDesc","String","")
+F.Data.DataTable.AddColumn("2003","Quantity","String","")
+F.Data.DataTable.AddColumn("2003","Cost","String","")
+F.Data.DataTable.AddColumn("2003","Price","String","")
+F.Data.DataTable.AddColumn("2003","PrintLabels","String","")
+F.Data.DataTable.AddColumn("2003","CostMethod","String","")
+F.Data.DataTable.AddColumn("2003","UpdateInv","String","")
+F.Data.DataTable.AddColumn("2003","InvDebitAcct","String","")
+
+'2003File is only used when mode = NS, any other mode does not use a file to import. As well, a file is not required for a NS mode import.
+F.Data.DataTable.Create("2003File",True)
+F.Data.DataTable.AddColumn("2003File","WONum","String","")
+F.Data.DataTable.AddColumn("2003File","WOSuffix","String","")
+F.Data.DataTable.AddColumn("2003File","Lot","String","")
+F.Data.DataTable.AddColumn("2003File","Bin","String","")
+F.Data.DataTable.AddColumn("2003File","Heat","String","")
+F.Data.DataTable.AddColumn("2003File","Serial","String","")
+F.Data.DataTable.AddColumn("2003File","SpecificQuantity","String","")
+F.Data.DataTable.AddColumn("2003File","ExpDate","String","")
+F.Data.DataTable.AddColumn("2003File","WarrantyMonths","String","")
+F.Data.DataTable.AddColumn("2003File","UserField1","String","")
+F.Data.DataTable.AddColumn("2003File","UserField2","String","")
+F.Data.DataTable.AddColumn("2003File","UserField3","String","")
+F.Data.DataTable.AddColumn("2003File","UserField4","String","")
+F.Data.DataTable.AddColumn("2003File","UserField5","String","")
+F.Data.DataTable.AddColumn("2003File","UserField6","String","")
+F.Data.DataTable.AddColumn("2003File","UserField7","String","")
+F.Data.DataTable.AddColumn("2003File","UserField8","String","")
+F.Data.DataTable.AddColumn("2003File","UserField9","String","")
+Program.Sub.Preflight.End
+
+Program.Sub.2003.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.sFilePath.Declare(String)
+	V.Local.sFileContent.Declare(String)
+	V.Local.sDataFilter.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	V.Local.iViewCount.Declare(Long,-1)
+	
+	'We loop through each row in the 2003 datatable. We check to see if the mode for the row is NS; if it is we check the 2003File datatable for any related rows. If rows are found, we then build a file off of those rows. If none are found, we pass the file name as an empty string
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.2003.RowCount--,1)
+		V.Local.sFileContent.Set("")
+		V.Local.sFilePath.Set("")
+		
+		F.Intrinsic.Control.If(V.DataTable.2003(V.Local.iCount).Mode!FieldVal,=,"NS")
+			'When we find a NS mode record in 2003 we loop through 2003File to create a file. If no rows are found we end up with a blank sFileContent. We can use this to tell if there were any lines in the dataview and set file path and contents appropriately
+			F.Intrinsic.String.Build("WONum = '{0}' AND WOSuffix= '{1}'",V.DataTable.2003(V.Local.iCount).WONum!FieldVal,V.DataTable.2003(V.Local.iCount).WOSuffix!FieldVal,V.Local.sDataFilter)
+			F.Data.DataView.Create("2003File","2003FileView",22,V.Local.sDataFilter,"")
+			
+			F.Intrinsic.Control.If(V.DataView.2003File!2003FileView.RowCount,>,0)
+				F.Data.DataView.ToString("2003File","2003FileView","Lot*!*Bin*!*Heat*!*Serial*!*SpecificQuantity*!*ExpDate*!*WarrantyMonths*!*UserField1*!*UserField2*!*UserField3*!*UserField4*!*UserField5*!*UserField6*!*UserField7*!*UserField8*!*UserField9",V.Ambient.Tab,V.Ambient.NewLine,V.Local.sFileContent)
+				F.Intrinsic.String.Build("{0}\{1}_2003lib.txt",V.Caller.FilesDir,V.Caller.Terminal,V.Local.sFilePath)
+				F.Intrinsic.File.String2File(V.Local.sFilePath,V.Local.sFileContent)
+			F.Intrinsic.Control.EndIf
+			F.Data.DataView.Close("2003File","2003FileView")
+			
+		F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.2003(V.Local.iCount).CompanyCode!FieldVal,V.DataTable.2003(V.Local.iCount).Terminal!FieldVal,V.DataTable.2003(V.Local.iCount).Program!FieldVal,V.DataTable.2003(V.Local.iCount).Mode!FieldVal,V.DataTable.2003(V.Local.iCount).PassDetailJob!FieldVal,V.DataTable.2003(V.Local.iCount).PassDetailSuffix!FieldVal,V.DataTable.2003(V.Local.iCount).PassDetailSequence!FieldVal,V.DataTable.2003(V.Local.iCount).PassDetailFill!FieldVal,V.DataTable.2003(V.Local.iCount).PassDetailDate!FieldVal,V.DataTable.2003(V.Local.iCount).PassDetailKeySeq!FieldVal,V.DataTable.2003(V.Local.iCount).WONum!FieldVal,V.DataTable.2003(V.Local.iCount).WOSuffix!FieldVal,V.DataTable.2003(V.Local.iCount).XferYear!FieldVal,V.DataTable.2003(V.Local.iCount).XferMonth!FieldVal,V.DataTable.2003(V.Local.iCount).XferDay!FieldVal,V.DataTable.2003(V.Local.iCount).CloseWO!FieldVal,V.DataTable.2003(V.Local.iCount).PartDesc!FieldVal,V.DataTable.2003(V.Local.iCount).Quantity!FieldVal,V.DataTable.2003(V.Local.iCount).Cost!FieldVal,V.DataTable.2003(V.Local.iCount).Price!FieldVal,V.DataTable.2003(V.Local.iCount).PrintLabels!FieldVal,V.DataTable.2003(V.Local.iCount).CostMethod!FieldVal,V.DataTable.2003(V.Local.iCount).UpdateInv!FieldVal,V.DataTable.2003(V.Local.iCount).InvDebitAcct!FieldVal,V.Local.sFilePath,V.Local.sParams)
+		
+		'Call wrapper according to which wrapper the end user calleds
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(2003,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(2003,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+		
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("2003")
+	F.Data.DataTable.DeleteRow("2003File")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"MainRow",V.Local.iCount,"SubRow",V.Local.iViewCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.2003.End
+
+'Calls 2003 with callwrapper type of 0
+Program.Sub.2003Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2003,"CallWrapperType",0)	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"MainRow",-2,"SubRow",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2003Sync.End
+
+'Calls 2003 with callwrapper type of 1
+Program.Sub.2003Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2003,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"MainRow",-2,"SubRow",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2003Async.End
+
+Program.Sub.CatchError2003.Start
+V.Local.iActualMainRow.Declare(Long)
+V.Local.iActualSubRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.MainRow,1,V.Local.iActualMainRow)
+F.Intrinsic.Math.Add(V.Args.SubRow,1,V.Local.iActualSubRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}*!*{4}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.iActualMainRow, V.Local.iActualSubRow, V.Global.s2003Error)
+Program.Sub.CatchError2003.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$rking$}$20241022094801847$}$QNdZLVy4bWuiWa9jh1ZTiPY99LydZoBNZNNwc1zr+4DDZK3m1T/msKV1Y4tu2l1WL+9gsjPVQEY=
+${$7$}$File Version:1.1.20241024131121.0
+Program.Sub.Comments.End

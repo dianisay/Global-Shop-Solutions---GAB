@@ -1,0 +1,97 @@
+'This library helps with the usage of the 1510 call wrapper (Admin Reprice Routers/Estimates, RE0019). To use it, simply add a row to the 1510 datatable for each call to the call wrapper that you want to make. From there, call 1510Sync or 1510Async.
+'The program will run through each row in the datatable, configure the needed parameters from it, and then call the callwrapper for that row. Once complete, the prgoram will delete all rows from 1510.
+
+'The datatable is structed as follows:
+'Column						 =	Parameter											= 	Possible Values
+'=======================================================================================================================================
+'Mode						 =	Mode												=	"PS": Populate the Screen. "NS": Screenless Mode
+'BegRouter					 =	Beginning Router									=	######
+'EndRouter					 =	End Router											=	######
+'AllRouter					 =	All Routers Flag									=	Y/N
+'SetupFromWC				 =	Pull Setup from Workcenter Flag						=	Y/N
+'RuntimeFromWC				 =	Pull Runtime from Workcenter Flag					=	Y/N
+'DescFromWC					 =	Pull Description from Workcenter Flag				=	Y/N
+'DescFromInvMatl			 =	Pull Description from Inventory (Material) Flag		=	Y/N
+'DescFromInvRouter			 =	Pull Description from Inventory (Router) Flag		=	Y/N
+'PLFromInvRouter			 =	Pull Product Line from Inventory (Router) Flag		=	Y/N
+'RepriceLaborOnly			 =	Reprice Labor Steps Only Flag						=	Y/N
+'RepriceMatlOnly			 =	Reprice Material Steps Only Flag					=	Y/N
+'UpdateAltCostRouter		 =	Update Alternate Cost Router Flag					=	Y/N
+'AltCostRepriceQty			 =	Alternate Cost Reprice Quantity						=	###### - UpdateAltCostRouter must be Y for this number to work.
+'ZeroUCForMfgParts			 =	Zero Unit Cost for Manufactured Parts Flag			=	Y/N
+'RefreshLeadTimeMatl		 =	Refresh Lead Time on Material Sequences Flag		=	Y/N	
+'RefreshLeadTimeOutside		 =	Refresh Lead Time on Outside Sequences Flag			=	Y/N
+'UpdateRateWithInvCostIfZero =	Update Rate with Inventory Cost Even if Zero Flag	=	Y/N
+'UpdateRateWithWCRateIfZero  =	Update Rate with Workcenter Rate Even if Zero Flag	=	Y/N
+'======================================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s1510Error.Declare(String)
+F.Data.DataTable.Create("1510",True)
+F.Data.DataTable.AddColumn("1510","Mode","String")
+F.Data.DataTable.AddColumn("1510","BegRouter","String")
+F.Data.DataTable.AddColumn("1510","EndRouter","String")
+F.Data.DataTable.AddColumn("1510","AllRouter","String")
+F.Data.DataTable.AddColumn("1510","SetupFromWC","String")
+F.Data.DataTable.AddColumn("1510","RuntimeFromWC","String")
+F.Data.DataTable.AddColumn("1510","DescFromWC","String")
+F.Data.DataTable.AddColumn("1510","DescFromInvMatl","String")
+F.Data.DataTable.AddColumn("1510","DescFromInvRouter","String")
+F.Data.DataTable.AddColumn("1510","PLFromInvRouter","String")
+F.Data.DataTable.AddColumn("1510","RepriceLaborOnly","String")
+F.Data.DataTable.AddColumn("1510","RepriceMatlOnly","String")
+F.Data.DataTable.AddColumn("1510","UpdateAltCostRouter","String")
+F.Data.DataTable.AddColumn("1510","AltCostRepriceQty","String")
+F.Data.DataTable.AddColumn("1510","ZeroUCForMfgParts","String")
+F.Data.DataTable.AddColumn("1510","RefreshLeadTimeMatl","String")
+F.Data.DataTable.AddColumn("1510","RefreshLeadTimeOutside","String")
+F.Data.DataTable.AddColumn("1510","UpdateRateWithInvCostIfZero","String")
+F.Data.DataTable.AddColumn("1510","UpdateRateWithWCRateIfZero","String")
+Program.Sub.Preflight.End
+
+Program.Sub.1510.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	
+	'For each datatable row, combine call wrapper parameters and then call callwrapper according to whichever sub the programmer called.
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.1510.RowCount--,1)
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.1510(V.Local.iCount).Mode!FieldVal,V.DataTable.1510(V.Local.iCount).BegRouter!FieldVal,V.DataTable.1510(V.Local.iCount).EndRouter!FieldVal,V.DataTable.1510(V.Local.iCount).AllRouter!FieldVal,V.DataTable.1510(V.Local.iCount).SetupFromWC!FieldVal,V.DataTable.1510(V.Local.iCount).RuntimeFromWC!FieldVal,V.DataTable.1510(V.Local.iCount).DescFromWC!FieldVal,V.DataTable.1510(V.Local.iCount).DescFromInvMatl!FieldVal,V.DataTable.1510(V.Local.iCount).DescFromInvRouter!FieldVal,V.DataTable.1510(V.Local.iCount).PLFromInvRouter!FieldVal,V.DataTable.1510(V.Local.iCount).RepriceLaborOnly!FieldVal,V.DataTable.1510(V.Local.iCount).RepriceMatlOnly!FieldVal,V.DataTable.1510(V.Local.iCount).UpdateAltCostRouter!FieldVal,V.DataTable.1510(V.Local.iCount).AltCostRepriceQty!FieldVal,V.DataTable.1510(V.Local.iCount).ZeroUCForMfgParts!FieldVal,V.DataTable.1510(V.Local.iCount).RefreshLeadTimeMatl!FieldVal,V.DataTable.1510(V.Local.iCount).RefreshLeadTimeOutside!FieldVal,V.DataTable.1510(V.Local.iCount).UpdateRateWithInvCostIfZero!FieldVal,V.DataTable.1510(V.Local.iCount).UpdateRateWithWCRateIfZero!FieldVal,V.Local.sParams)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(1510,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(1510,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+		
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("1510")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1510,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.1510.End
+
+'Calls 1510 with callwrapper type of 0.
+Program.Sub.1510Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(1510,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1510,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.1510Sync.End
+
+'Calls 1510 with callwrapper type of 1.
+Program.Sub.1510Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(1510,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1510,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.1510Async.End
+
+Program.Sub.CatchError1510.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s1510Error)
+Program.Sub.CatchError1510.End

@@ -1,0 +1,209 @@
+Program.Sub.ScreenSU.Start
+Gui.2009_Mode..Create
+Gui.2009_Mode..Caption("Select Mode(s)")
+Gui.2009_Mode..Size(2745,3225)
+Gui.2009_Mode..MinX(0)
+Gui.2009_Mode..MinY(0)
+Gui.2009_Mode..Position(0,0)
+Gui.2009_Mode..BackColor(-2147483633)
+Gui.2009_Mode..MousePointer(0)
+Gui.2009_Mode..Event(UnLoad,2009_Mode_UnLoad)
+Gui.2009_Mode..Sizeable(False)
+Gui.2009_Mode..MaxButton(False)
+Gui.2009_Mode..MinButton(False)
+Gui.2009_Mode.chk2009All.Create(CheckBox)
+Gui.2009_Mode.chk2009All.Size(1125,360)
+Gui.2009_Mode.chk2009All.Position(90,180)
+Gui.2009_Mode.chk2009All.Caption("All Modes")
+Gui.2009_Mode.chk2009All.Event(Click,chk2009All_Click)
+Gui.2009_Mode.chk2009New.Create(CheckBox)
+Gui.2009_Mode.chk2009New.Size(2490,360)
+Gui.2009_Mode.chk2009New.Position(90,930)
+Gui.2009_Mode.chk2009New.Caption("N - New")
+Gui.2009_Mode.chk2009New.Event(Click,2009ValueCheck)
+Gui.2009_Mode.chk2009Copy.Create(CheckBox)
+Gui.2009_Mode.chk2009Copy.Size(1995,360)
+Gui.2009_Mode.chk2009Copy.Position(90,1305)
+Gui.2009_Mode.chk2009Copy.Caption("C - Copy")
+Gui.2009_Mode.chk2009Copy.Event(Click,2009ValueCheck)
+Gui.2009_Mode.chk2009View.Create(CheckBox)
+Gui.2009_Mode.chk2009View.Size(2565,360)
+Gui.2009_Mode.chk2009View.Position(90,1680)
+Gui.2009_Mode.chk2009View.Caption("V - View")
+Gui.2009_Mode.chk2009View.Event(Click,2009ValueCheck)
+Gui.2009_Mode.chk2009Open.Create(CheckBox)
+Gui.2009_Mode.chk2009Open.Size(1410,360)
+Gui.2009_Mode.chk2009Open.Position(90,555)
+Gui.2009_Mode.chk2009Open.Caption("O - Open")
+Gui.2009_Mode.chk2009Open.Event(Click,2009ValueCheck)
+Gui.2009_Mode.cmdGo2009.Create(Button)
+Gui.2009_Mode.cmdGo2009.Size(1545,345)
+Gui.2009_Mode.cmdGo2009.Position(480,2130)
+Gui.2009_Mode.cmdGo2009.Caption("Go")
+Gui.2009_Mode.cmdGo2009.Event(Click,cmdGo2009_Click)
+Program.Sub.ScreenSU.End
+
+'Column		=	Parameter			=	Possible Values
+'================================================================================================================
+'WONum		=	Work Order Number	=	######
+'WOSuffix	=	Work Order Suffix	=	###
+'Switch		=	Switch				=	"O" - Open
+'									=	"N" - New
+'									=	"C" - Copy
+'									=	"V" - View
+'================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.b2009Closed.Declare(Boolean)
+Program.Sub.Preflight.End
+
+Program.Sub.2009Validate.Start
+F.Intrinsic.Control.Try
+	
+	V.Global.b2009Closed.Set(False)
+	
+	'Check to see if this was called by Manual Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,!=,"M")
+	
+		Gui.2009_Mode..Show
+		Gui.2009_Mode..WaitForDismiss
+		
+		F.Intrinsic.Control.If(V.Global.b2009Closed.Not)
+			
+			F.Intrinsic.Control.If(V.Screen.2009_Mode!chk2009Open.Value,=,1)
+				F.Data.DataTable.AddRow("2009","WONum","000155","WOSuffix","001","Switch","O")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2009_Mode!chk2009New.Value,=,1)
+				F.Data.DataTable.AddRow("2009","WONum","000222","WOSuffix","001","Switch","N")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2009_Mode!chk2009Copy.Value,=,1)
+				F.Data.DataTable.AddRow("2009","WONum","000155","WOSuffix","001","Switch","C")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2009_Mode!chk2009View.Value,=,1)
+				F.Data.DataTable.AddRow("2009","WONum","000155","WOSuffix","001","Switch","V")
+			F.Intrinsic.Control.EndIf
+	
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O","AND",V.Global.b2009Closed,=,False)
+		F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+	F.Intrinsic.Control.EndIf
+			
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed,=,False,"AND",V.Global.b2009Closed,=,False)
+		F.Intrinsic.Control.CallSub(2009_Mode_Unload)
+		F.Intrinsic.Control.CallSub(2009Sync)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(2009_Mode_Unload)
+		F.Data.DataTable.DeleteRow("2009")
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009Validate.End
+
+'Runs when check all button is clicked. If check all is checked, all others are checked. If it is unchecked, all others are unchecked.
+Program.Sub.chk2009All_Click.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.BlockEvents
+	
+	F.Intrinsic.Control.If(V.Screen.2009_Mode!chk2009All.Value,=,0)
+		F.Intrinsic.Control.CallSub(2009UnCheckAll)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(2009CheckAll)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.UnBlockEvents	
+	
+	'Set focus to reset the click events. Without this you have to double click.
+	Gui.2009_Mode.cmdGo2009.SetFocus
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.chk2009All_Click.End
+
+'Runs when a box is checked that is not the check all box. This sub just unchecks the check all box if it is checked and another box is unchecked.
+Program.Sub.2009ValueCheck.Start
+F.Intrinsic.Control.Try
+
+	'Block events from firing in this event
+	F.Intrinsic.Control.BlockEvents
+	
+	F.Intrinsic.Control.If(V.Screen.[V.Args.ControlName].Value,=,0)
+		Gui.2009_Mode.chk2009All.Value(0)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.UnBlockEvents
+	
+ 	'Set focus to reset the click events. Without this you have to double click.
+	Gui.2009_Mode.cmdGo2009.SetFocus
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009ValueCheck.End
+
+'Hides the form. This causes Main to start running after the  Gui.2009_Mode..WaitForDismiss line
+Program.Sub.cmdGo2009_Click.Start
+F.Intrinsic.Control.Try
+	
+	Gui.2009_Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdGo2009_Click.End
+
+'Checks all boxes
+Program.Sub.2009CheckAll.Start
+F.Intrinsic.Control.Try
+	Gui.2009_Mode.chk2009All.Value(1)
+	gui.2009_Mode.chk2009Open.Value(1)
+	gui.2009_Mode.chk2009New.Value(1)
+	gui.2009_Mode.chk2009Copy.Value(1)
+	gui.2009_Mode.chk2009View.Value(1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009CheckAll.End
+
+'Unchecks all boxes
+Program.Sub.2009UnCheckAll.Start
+F.Intrinsic.Control.Try
+	Gui.2009_Mode.chk2009All.Value(0)
+	gui.2009_Mode.chk2009Open.Value(0)
+	gui.2009_Mode.chk2009New.Value(0)
+	gui.2009_Mode.chk2009Copy.Value(0)
+	gui.2009_Mode.chk2009View.Value(0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009UnCheckAll.End
+
+'Unchecks every box then hides the screen. This prevents the tests from running if a box is checked and then the program is closed.
+Program.Sub.2009_Mode_UnLoad.Start
+F.Intrinsic.Control.Try
+	V.Global.b2009Closed.Set(True)
+	
+	F.Intrinsic.Control.BlockEvents
+	F.Intrinsic.Control.CallSub(2009UnCheckAll)
+	F.Intrinsic.Control.UnBlockEvents
+	
+	Gui.2009_Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009_Mode_UnLoad.End
+
+Program.Sub.CatchError2009Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 2009Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError2009Validate.End

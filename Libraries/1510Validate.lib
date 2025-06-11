@@ -1,0 +1,132 @@
+Program.Sub.ScreenSU.Start
+Gui.1510Mode..Create
+Gui.1510Mode..Size(2145,2325)
+Gui.1510Mode..MinX(0)
+Gui.1510Mode..MinY(0)
+Gui.1510Mode..Position(0,0)
+Gui.1510Mode..BackColor(-2147483633)
+Gui.1510Mode..MousePointer(0)
+Gui.1510Mode..Caption("Mode Selection")
+Gui.1510Mode..Event(UnLoad,1510Mode_UnLoad)
+Gui.1510Mode..MaxButton(False)
+Gui.1510Mode..MinButton(False)
+Gui.1510Mode..Sizeable(False)
+Gui.1510Mode.ddl1510Mode.Create(DropDownList)
+Gui.1510Mode.ddl1510Mode.Size(1620,330)
+Gui.1510Mode.ddl1510Mode.Position(150,495)
+Gui.1510Mode.cmd1510Go.Create(Button)
+Gui.1510Mode.cmd1510Go.Size(1620,375)
+Gui.1510Mode.cmd1510Go.Position(150,1020)
+Gui.1510Mode.cmd1510Go.Caption("Go")
+Gui.1510Mode.cmd1510Go.Event(Click,cmd1510Go_Click)
+Gui.1510Mode.lbl1510Mode.Create(Label,"Screen Mode",True,1335,255,0,180,225,True,0,"Arial",8,-2147483633,0)
+Program.Sub.ScreenSU.End
+
+'The datatable is structed as follows:
+'Column						 =	Parameter											= 	Possible Values
+'=======================================================================================================================================
+'Mode						 =	Mode												=	"PS": Populate the Screen. "NS": Screenless Mode
+'BegRouter					 =	Beginning Router									=	######
+'EndRouter					 =	End Router											=	######
+'AllRouter					 =	All Routers Flag									=	Y/N
+'SetupFromWC				 =	Pull Setup from Workcenter Flag						=	Y/N
+'RuntimeFromWC				 =	Pull Runtime from Workcenter Flag					=	Y/N
+'DescFromWC					 =	Pull Description from Workcenter Flag				=	Y/N
+'DescFromInvMatl			 =	Pull Description from Inventory (Material) Flag		=	Y/N
+'DescFromInvRouter			 =	Pull Description from Inventory (Router) Flag		=	Y/N
+'PLFromInvRouter			 =	Pull Product Line from Inventory (Router) Flag		=	Y/N
+'RepriceLaborOnly			 =	Reprice Labor Steps Only Flag						=	Y/N
+'RepriceMatlOnly			 =	Reprice Material Steps Only Flag					=	Y/N
+'UpdateAltCostRouter		 =	Update Alternate Cost Router Flag					=	Y/N
+'AltCostRepriceQty			 =	Alternate Cost Reprice Quantity						=	###### - UpdateAltCostRouter must be Y for this number to work.
+'ZeroUCForMfgParts			 =	Zero Unit Cost for Manufactured Parts Flag			=	Y/N
+'RefreshLeadTimeMatl		 =	Refresh Lead Time on Material Sequences Flag		=	Y/N	
+'RefreshLeadTimeOutside		 =	Refresh Lead Time on Outside Sequences Flag			=	Y/N
+'UpdateRateWithInvCostIfZero =	Update Rate with Inventory Cost Even if Zero Flag	=	Y/N
+'UpdateRateWithWCRateIfZero  =	Update Rate with Workcenter Rate Even if Zero Flag	=	Y/N
+'======================================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.b1510Closed.Declare(Boolean)
+Program.Sub.Preflight.End
+
+Program.Sub.1510Validate.Start
+F.Intrinsic.Control.Try
+	
+	V.Global.b1510Closed.Set(False)
+	
+	'Check to see if this was called by Manual Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,!=,"M")
+	
+		'Clear items and add the options for the program.
+		Gui.1510Mode.ddl1510Mode.ClearItems
+		Gui.1510Mode.ddl1510Mode.AddItem("Both")
+		Gui.1510Mode.ddl1510Mode.AddItem("Populate Screen")
+		Gui.1510Mode.ddl1510Mode.AddItem("Screenless")
+		Gui.1510Mode.ddl1510Mode.Text("Both")
+		Gui.1510Mode..Show
+		Gui.1510Mode..WaitForDismiss
+		
+		F.Intrinsic.Control.If(V.Global.b1510Closed.Not)
+		
+			'Add test data
+			F.Intrinsic.Control.If(V.Screen.1510Mode!ddl1510Mode.Value,=,"Both","OR",V.Screen.1510Mode!ddl1510Mode.Value,=,"Populate Screen")
+				'Tests populate screen mode
+				F.Data.DataTable.AddRow("1510","Mode","PS","BegRouter","210900","EndRouter","210900-2","AllRouter","N","SetupFromWC","Y","RuntimeFromWC","Y","DescFromWC","Y","DescFromInvMatl","Y","DescFromInvRouter","Y","PLFromInvRouter","Y","RepriceLaborOnly","Y","RepriceMatlOnly","Y","UpdateAltCostRouter","Y","AltCostRepriceQty","100","ZeroUCForMfgParts","Y","RefreshLeadTimeMatl","Y","RefreshLeadTimeOutside","Y","UpdateRateWithInvCostIfZero","Y","UpdateRateWithWCRateIfZero","Y")	
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.1510Mode!ddl1510Mode.Value,=,"Both","OR",V.Screen.1510Mode!ddl1510Mode.Value,=,"Screenless")
+				'Tests screenless mode with all routers selected.
+				F.Data.DataTable.AddRow("1510","Mode","NS","BegRouter","","EndRouter","","AllRouter","Y","SetupFromWC","Y","RuntimeFromWC","Y","DescFromWC","N","DescFromInvMatl","Y","DescFromInvRouter","Y","PLFromInvRouter","Y","RepriceLaborOnly","Y","RepriceMatlOnly","Y","UpdateAltCostRouter","Y","AltCostRepriceQty","100","ZeroUCForMfgParts","Y","RefreshLeadTimeMatl","Y","RefreshLeadTimeOutside","Y","UpdateRateWithInvCostIfZero","Y","UpdateRateWithWCRateIfZero","Y")
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O","AND",V.Global.b1510Closed,=,False)
+		F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+	F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed,=,False,"AND",V.Global.b1510Closed,=,False)
+		F.Intrinsic.Control.CallSub(1510Mode_Unload)
+		F.Intrinsic.Control.CallSub(1510Sync)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(1510Mode_Unload)
+		F.Data.DataTable.DeleteRow("1510")
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1510Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.1510Validate.End
+
+Program.Sub.cmd1510Go_Click.Start
+F.Intrinsic.Control.Try
+
+	'Just need to hide the screen to continue.
+	Gui.1510Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1510Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmd1510Go_Click.End
+
+Program.Sub.1510Mode_UnLoad.Start
+F.Intrinsic.Control.Try
+	V.Global.b1510Closed.Set(True)
+	
+	'Clear items so that the program doesn't add any test data to the datatable.
+	Gui.1510Mode.ddl1510Mode.ClearItems
+	Gui.1510Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1510Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.1510Mode_UnLoad.End
+
+Program.Sub.CatchError1510Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 1510Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError1510Validate.End

@@ -1,0 +1,66 @@
+'This library helps with the use of the 2009 Call wrapper, New/Edit/View Work Order (JB0010GI). To use it, simply fill out the 2009 datatable with the data for a single call to the call wrapper for each row.
+'Then call either 2009Sync or 2009Async to have the call wrapper run on each row.
+'The datatable is structed as follows:
+'Column		=	Parameter			=	Possible Values
+'================================================================================================================
+'WONum		=	Work Order Number	=	######
+'WOSuffix	=	Work Order Suffix	=	###
+'Switch		=	Switch				=	"O" - Open
+'									=	"N" - New
+'									=	"C" - Copy
+'									=	"V" - View
+'================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s2009Error.Declare(String)
+F.Data.DataTable.Create("2009",True)
+F.Data.DataTable.AddColumn("2009","WONum","String")
+F.Data.DataTable.AddColumn("2009","WOSuffix","String")
+F.Data.DataTable.AddColumn("2009","Switch","String")
+Program.Sub.Preflight.End
+
+Program.Sub.2009.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	
+	'For each row in the datatable: concat needed parameters then call the callwrapper according to how the programmer called
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.2009.RowCount--,1)
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.2009(V.Local.iCount).WONum!FieldVal,V.DataTable.2009(V.Local.iCount).WOSuffix!FieldVal,V.DataTable.2009(V.Local.iCount).Switch!FieldVal,V.Local.sParams)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(2009,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(2009,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("2009")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009.End
+
+'Calls 2009 with callwrapper type of 0. Passes existance of Test argument if it is provided.
+Program.Sub.2009Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2009,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009Sync.End
+
+'Calls 2009 with callwrapper type of 1. Passes existance of Test argument if it is provided.
+Program.Sub.2009Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2009,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2009, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2009Async.End
+
+Program.Sub.CatchError2009.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s2009Error)
+Program.Sub.CatchError2009.End

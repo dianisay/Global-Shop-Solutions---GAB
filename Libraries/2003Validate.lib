@@ -1,0 +1,406 @@
+Program.Sub.ScreenSU.Start
+Gui.2003Mode..Create
+Gui.2003Mode..Size(2145,2325)
+Gui.2003Mode..MinX(0)
+Gui.2003Mode..MinY(0)
+Gui.2003Mode..Position(0,0)
+Gui.2003Mode..BackColor(-2147483633)
+Gui.2003Mode..MousePointer(0)
+Gui.2003Mode..Caption("Mode Selection")
+Gui.2003Mode..Event(UnLoad,2003Mode_UnLoad)
+Gui.2003Mode..MaxButton(False)
+Gui.2003Mode..MinButton(False)
+Gui.2003Mode..Sizeable(False)
+Gui.2003Mode.ddl2003Mode.Create(DropDownList)
+Gui.2003Mode.ddl2003Mode.Size(1620,330)
+Gui.2003Mode.ddl2003Mode.Position(150,495)
+Gui.2003Mode.cmd2003Go.Create(Button)
+Gui.2003Mode.cmd2003Go.Size(1620,375)
+Gui.2003Mode.cmd2003Go.Position(150,1020)
+Gui.2003Mode.cmd2003Go.Caption("Go")
+Gui.2003Mode.cmd2003Go.Event(Click,cmd2003Go_Click)
+Gui.2003Mode.lbl2003Mode.Create(Label,"Screen Mode",True,1335,255,0,180,225,True,0,"Arial",8,-2147483633,0)
+Gui.F_ManualEntry2003..Create
+Gui.F_ManualEntry2003..Caption("Manual Data Entry")
+Gui.F_ManualEntry2003..Size(20760,8505)
+Gui.F_ManualEntry2003..MinX(0)
+Gui.F_ManualEntry2003..MinY(0)
+Gui.F_ManualEntry2003..Position(0,0)
+Gui.F_ManualEntry2003..BackColor(-2147483633)
+Gui.F_ManualEntry2003..MaxButton(False)
+Gui.F_ManualEntry2003..MousePointer(0)
+Gui.F_ManualEntry2003..Sizeable(False)
+Gui.F_ManualEntry2003..Event(UnLoad,F_ManualEntry2003_UnLoad)
+Gui.F_ManualEntry2003.cmdRunTest2003.Create(Button)
+Gui.F_ManualEntry2003.cmdRunTest2003.Size(1485,375)
+Gui.F_ManualEntry2003.cmdRunTest2003.Position(180,7410)
+Gui.F_ManualEntry2003.cmdRunTest2003.Caption("Run Test")
+Gui.F_ManualEntry2003.cmdRunTest2003.Event(Click,cmdRunTest2003_Click)
+Gui.F_ManualEntry2003.gsGridManualEntry2003.Create(GsGridControl)
+Gui.F_ManualEntry2003.gsGridManualEntry2003.Size(20070,7020)
+Gui.F_ManualEntry2003.gsGridManualEntry2003.Position(195,240)
+Gui.F_ManualEntry2003.gsGridManualEntry2003.Event(RowCellClick,gsGridManualEntry2003_RowCellClick)
+Program.Sub.ScreenSU.End
+'2003 Lib can be used to ease the process of calling the 2003 call wrapper for WIP to Finished Goods (JB0052GI). This emulates going through Shop Floor Control > Transactions > WIP To Finished Goods.
+'When using mode "NS" it is possible to use a file to WIP to FG to specific lot/bin/heat/serial numbers.
+'You don't have to worry about setting up a file in this case. There are 2 datatables to fill out, 2003 and 2003File. Each row in the 2003 datatable represents one call to the 2003 call wrapper.
+'Each row in the 2003File datatable represents a row in the file portion of the upload when mode = NS. The two tables are linked on the Work Order and suffix, so if you need to add multiple rows to the file
+'for a single item in the 2003 datatable just add multiple rows to the 2003File datatable with the same work order and suffix as the row in the 2003 datatable.
+
+'*****IMPORTANT******
+'The File for callwrapper 2003 is used for Lot\Bin records only. Because of how the CORE program utilizes the File you will not be able to mix lot\bin parts with non-lot\bin parts.
+'*****IMPORTANT******
+
+'Call wrapper documentation: http://www.gss-updates.com/site/gabhelpen/function_global_general_callwrapperasync.htm?zoom_highlightsub=callwrapper
+
+'2003 Datatable paremeters are as follows. Unless otherwise noted, each line defaults to an empty string if not entered
+'Company Code - Defaults to logged in company code if not entered
+'Terminal - Defaults to logged in terminal if not entered
+'Calling Program - Defaults to V.Caller.Caller if not entered
+'Mode - - Default to screenless mode if none enetered
+'	"NS": Screenless Mode
+'	"OS": Open screen Mode
+'Pass Detail Job^
+'Pass Detail Suffix^
+'Pass Detail Sequence
+'Pass Detail Fill^
+'Pass Detail Date^
+'Pass Detail Key Sequence^
+'Workorder*
+'Workorder Suffix*
+'Transfer Date Year*#
+'Transfer Date Month*#
+'Transfer Date Date*#
+'Close Workorder Flag* (Y or N)
+'	"Y": Close work order
+'	"N": Do not close work order
+'Part Description*#
+'Quantity*
+'Cost*
+'Price*
+'Print Labels Flag* (Y or N)
+'	"Y": Print labels
+'	"N": Do not print labels
+''Cost Method*
+'	"E": Estimate
+'	"P": Percentage
+'	"I": Inventory
+'	"L": Alt Cost
+'	"A": Actual
+'	"R": Remaining
+'	"U": Entered
+'Update Inventory Flag* (Y or N)
+'	"Y": Update inventory
+'	"N": Do not update inventory
+'Inventory Debit Account*
+'
+'If any of the columns are blank, they are assumed to be empty. A valid or empty bin is required.
+'^ indicates that this parameter is only used when no mode is specified.
+'* indicates that this parameter is only used in screenless mode.
+'# indicates that this parameter is optional. If blank, it will be set to its default value.
+'The 2003File datatable is structured as follows.
+'WONum
+'WOSuffix
+'Lot
+'Bin
+'Heat
+'Serial
+'Specific Quantity - All rows in this table for a work order + suffix identifier must have their specific quantities sum to the 2003 datatables quantity for the work order + suffix
+'Expiration Date
+'Warranty Months
+'User Field 1
+'User Field 2
+'User Field 3
+'User Field 4
+'User Field 5
+'User Field 6
+'User Field 7
+'User Field 8
+'User Field 9
+' 
+'Other notes:
+'If screenless mode is on, all error messages will be suppressed. If an error occurs, the text from the error message will be passed back as a parameter and can be accessed via Variable.Ambient.CallWrapperReturn.
+'Call Wrapper types:
+'0 - CallwrapperSync (Default)
+'1 - CallwrapperAsync
+Program.Sub.Preflight.Start
+V.Global.b2003Closed.Declare(Boolean,False)
+Program.Sub.Preflight.End
+
+Program.Sub.2003Validate.Start
+F.Intrinsic.Control.Try
+	
+	'Reset closed variable for multi-test in one run support
+	V.Global.b2003Closed.Set(False)
+	
+	F.Intrinsic.Control.If(V.Caller.Switches,!=,"M")
+		
+		'Clear items and add the options for the program.
+		Gui.2003Mode.ddl2003Mode.ClearItems
+		Gui.2003Mode.ddl2003Mode.AddItem("Both")
+		Gui.2003Mode.ddl2003Mode.AddItem("Populate Screen")
+		Gui.2003Mode.ddl2003Mode.AddItem("Screenless")
+		Gui.2003Mode.ddl2003Mode.Text("Both")
+		
+		Gui.2003Mode..Show
+		Gui.2003Mode..WaitForDismiss
+		
+		F.Intrinsic.Control.If(V.Global.b2003Closed.Not)
+			'Add test data
+			F.Intrinsic.Control.If(V.Screen.2003Mode!ddl2003Mode.Value,=,"Both","OR",V.Screen.2003Mode!ddl2003Mode.Value,=,"Populate Screen")
+				'Tests show screen mode without a file
+				F.Data.DataTable.AddRow("2003","Mode","OS","WONum","500003","WOSuffix","000","XferYear","2017","XferMonth","10","XferDay","31","CloseWO","N","PartDesc","IPX 8 ASSEMBLY","Quantity","1","Cost","2.25","Price","5","PrintLabels","N","CostMethod","E","UpdateInv","Y")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2003Mode!ddl2003Mode.Value,=,"Both","OR",V.Screen.2003Mode!ddl2003Mode.Value,=,"Screenless")
+				'Tests screenless mode with a file
+				F.Data.DataTable.AddRow("2003","Mode","NS","WONum","500003","WOSuffix","000","XferYear","2017","XferMonth","10","XferDay","31","CloseWO","N","PartDesc","IPX 8 ASSEMBLY","Quantity","3","Cost","2.25","Price","5","PrintLabels","N","CostMethod","E","UpdateInv","Y")
+				F.Data.DataTable.AddRow("2003File","WONum","500003","WOSuffix","000","Lot","100","Bin","A00001","Heat","3333333333333","Serial","73737373","SpecificQuantity","1","ExpDate",V.Ambient.Date.PervasiveDate,"WarrantyMonths","6","UserField1","test field 1","UserField2","test field 2","UserField3","test field 3","UserField4","test field 4","UserField5","test field 5","UserField6","test field 6","UserField7","test field 7","UserField8","test field 8","UserField9","test field 9")
+				F.Data.DataTable.AddRow("2003File","WONum","500003","WOSuffix","000","Lot","100","Bin","A00002","Heat","3333333333333","Serial","73737374","SpecificQuantity","2","ExpDate",V.Ambient.Date.PervasiveDate,"WarrantyMonths","6","UserField1","test field 1","UserField2","test field 2","UserField3","test field 3","UserField4","test field 4","UserField5","test field 5","UserField6","test field 6","UserField7","test field 7","UserField8","test field 8","UserField9","test field 9")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.Else
+		F.Data.DataTable.AddRow("2003")
+		F.Data.DataTable.AddRow("2003File")
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+    F.Intrinsic.Control.If(V.Caller.Switches,=,"O","OR",V.Caller.Switches,=,"M")
+        'This prevents the second manual data entry screen from appearing if the first screen is unloaded
+    	F.Intrinsic.Control.If(V.Global.b2003Closed.Not)
+    	
+	    	'Load screen and wait for it to be dismissed before running callwrapper.
+	        F.Intrinsic.Control.CallSub(LoadManualDataEntry2003)
+	        
+	     	'LoadManualDataEntry will create temporary copies of the main datatables and will re-write those tables when dismissed so we clear the tables out for now to prevent duplicate data in test re-runs after closing the screen
+	        F.Data.DataTable.DeleteRow("2003")
+	        F.Data.DataTable.DeleteRow("2003File")
+	        
+	        Gui.F_ManualEntry2003..WaitForDismiss
+    	
+    	F.Intrinsic.Control.EndIf
+    F.Intrinsic.Control.EndIf
+    
+    'Verify that the manual entry screen wasn't closed through the X before continuing
+	F.Intrinsic.Control.If(V.Global.b2003Closed.Not)
+		F.Intrinsic.Control.CallSub(2003Mode_UnLoad)
+		F.Intrinsic.Control.CallSub(2003Sync)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2003Validate.End
+
+Program.Sub.LoadManualDataEntry2003.Start
+F.Intrinsic.Control.Try
+	'Create main DT for grid which will contain the subgrids for each table in 2003.lib.
+	F.Data.DataTable.Create("2003Validate",True)
+	F.Data.DataTable.AddColumn("2003Validate","TableName","String")
+	F.Data.DataTable.AddColumn("2003Validate","AddButton","String")
+	F.Data.DataTable.AddColumn("2003Validate","RemoveButton","String")
+	F.Data.DataTable.AddRow("2003Validate","TableName","2003")
+	F.Data.DataTable.AddRow("2003Validate","TableName","2003File")
+	
+	F.Data.DataView.Create("2003","2003View",22)
+	F.Data.DataView.ToDataTable("2003","2003View","2003Validate$2003",True)
+	F.Data.DataView.Close("2003","2003View")
+	
+	F.Data.DataView.Create("2003File","2003FileView",22)
+	F.Data.DataView.ToDataTable("2003File","2003FileView","2003Validate$2003File",True)
+	F.Data.DataView.Close("2003File","2003FileView")
+	
+	'Add temporary column to lib datatables to link them to the main gsgc DT
+	F.Data.DataTable.AddColumn("2003Validate$2003","TableName","String","2003")
+	F.Data.DataTable.AddColumn("2003Validate$2003File","TableName","String","2003File")
+	
+	'Add relation between main gsgc DT and the DTs we are working with
+	F.Data.DataTable.AddRelation("2003Validate","TableName","2003Validate$2003","TableName")
+	F.Data.DataTable.AddRelation("2003Validate","TableName","2003Validate$2003File","TableName")
+	
+	'Generate dataviews of tables to be used by grid controls
+	F.Data.DataView.Create("2003Validate","2003ValidateView",22)
+	F.Data.DataView.Create("2003Validate$2003","2003View",22)
+	F.Data.DataView.Create("2003Validate$2003File","2003FileView",22)
+	'Call initialize screen (build style for gsgc)
+	F.Intrinsic.Control.CallSub(InitializeScreen2003)
+	
+	Gui.F_ManualEntry2003..Show
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadManualDataEntry2003.End
+
+'Build style for grid control
+Program.Sub.InitializeScreen2003.Start
+F.Intrinsic.Control.Try
+
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.AddGridviewFromDataview("2003ValidateGridView","2003Validate","2003ValidateView")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.AddGridviewFromDataview("2003GridView","2003Validate","2003View")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.AddGridviewFromDataview("2003FileGridView","2003Validate","2003FileView")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.MainView("2003ValidateGridView")
+	
+	'2003Validate
+	'Captions
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","TableName","Caption","Table")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","AddButton","Caption","Add")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","RemoveButton","Caption","Remove")
+	'Center
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","AddButton","HeaderHAlignment","Center")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","RemoveButton","HeaderHAlignment","Center")
+	'ColumnEdit (buttons) - have to be un-editable for the rowcellclick event to work properly
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.ColumnEdit("2003ValidateGridView","AddButton","EditorButton","Add New Row")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.ColumnEdit("2003ValidateGridView","RemoveButton","EditorButton","Remove Selected Row")
+	GUi.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","AddButton","AllowEdit","False")
+	GUi.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","AddButton","ReadOnly","True")
+	GUi.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","RemoveButton","AllowEdit","False")
+	GUi.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","RemoveButton","ReadOnly","True")
+	'Widths
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","AddButton","MinWidth","80")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","AddButton","MaxWidth","80")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","RemoveButton","MinWidth","120")
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003ValidateGridView","RemoveButton","MaxWidth","120")
+	'Set grid appearance to alternate background colors
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetGridviewProperty("2003ValidateGridView","EnableAppearanceOddRow","True")
+	'Expand Grids
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.ExpandMasterRow("2003ValidateGridView",0)
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.ExpandMasterRow("2003ValidateGridView",1)
+	
+	'2003
+	'Hide TableName column
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003GridView","TableName","Visible","False")
+	'Column edits
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetGridviewProperty("2003GridView","ReadOnly","False")
+	'Set grid appearance to alternate background colors
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetGridviewProperty("2003GridView","EnableAppearanceOddRow","True")
+	
+	'2003File
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetColumnProperty("2003FileGridView","TableName","Visible","False")
+	'Column edits
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetGridviewProperty("2003FileGridView","ReadOnly","False")
+	'Set grid appearance to alternate background colors
+	Gui.F_ManualEntry2003.gsGridManualEntry2003.SetGridviewProperty("2003FileGridView","EnableAppearanceOddRow","True")
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.InitializeScreen2003.End
+
+Program.Sub.cmdRunTest2003_Click.Start
+F.Intrinsic.Control.Try
+	
+	'Regenerate the 2003 and 2003File datatables from the temp datatables. We start by clearing out the current tables, then using the merge function to merge the 
+	'temp datatables into the corret tables. true preserves changes and mode 2 drops any columns that don't exist in the target table which removes the TableName column.
+	F.Data.DataTable.DeleteRow("2003")
+	F.Data.DataTable.DeleteRow("2003File")
+	
+	F.Data.DataTable.Merge("2003Validate$2003","2003",true,2)
+	F.Data.DataTable.Merge("2003Validate$2003File","2003File",true,2)
+	
+	'Closing the 2003Validate table will close all views, child datatables, and child datatable views associated with it.
+	F.Data.DataTable.Close("2003Validate")
+	
+	'Hide the screen. This causes the 2003Validate sub to continue from the Gui.F_ManualEntry2003..WaitForDismiss line.
+	Gui.F_ManualEntry2003..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdRunTest2003_Click.End
+
+'Runs every time a cell is clicked - used for add and remove buttons
+Program.Sub.gsGridManualEntry2003_RowCellClick.Start
+F.Intrinsic.Control.Try
+	V.Local.sGridViewSelectedRows.Declare(String)
+	V.Local.iCount.Declare(Long)
+	
+	'For add button, just add a row to the DT after checking which add button was checked
+	F.Intrinsic.Control.If(V.Args.Column.LCase,=,"addbutton")
+	
+		F.Intrinsic.Control.If(V.Args.RowIndex,=,0)
+			F.Data.DataTable.AddRow("2003Validate$2003")
+		F.Intrinsic.Control.ElseIf(V.Args.RowIndex,=,1)
+			F.Data.DataTable.AddRow("2003Validate$2003File")
+		F.Intrinsic.Control.EndIf
+	
+	'for remove button, check which remove button is clicked, then retrieve the active selected rows from the previously selected grid view (since clicking the button changes the current row of the gsgc).
+	'Then split out the rows in case multiple are selected and for each remove that row from the DT (we work from the high number down to prevent issues with the row numbers changing after a row is removed).
+	F.Intrinsic.Control.ElseIf(V.Args.Column.LCase,=,"removebutton")
+	
+		F.Intrinsic.Control.If(V.Args.RowIndex,=,0,"AND",V.DataTable.2003Validate$2003.RowCount,>,0)
+			
+			Gui.F_ManualEntry2003.gsGridManualEntry2003.GetSelectedRows("2003GridView",V.Local.sGridViewSelectedRows)
+			F.Intrinsic.String.Split(V.Local.sGridViewSelectedRows,"*!*",V.Local.sGridViewSelectedRows)
+			
+			F.Intrinsic.Control.For(V.Local.iCount,V.Local.sGridViewSelectedRows.UBound,V.Local.sGridViewSelectedRows.LBound,-1)
+				F.Data.DataTable.DeleteRow("2003Validate$2003",V.Local.sGridViewSelectedRows(V.Local.iCount))
+			F.Intrinsic.Control.Next(V.Local.iCount)
+			
+		F.Intrinsic.Control.ElseIf(V.Args.RowIndex,=,1,"AND",V.DataTable.2003Validate$2003File.RowCount,>,0)
+		
+			Gui.F_ManualEntry2003.gsGridManualEntry2003.GetSelectedRows("2003FileGridView",V.Local.sGridViewSelectedRows)
+			F.Intrinsic.String.Split(V.Local.sGridViewSelectedRows,"*!*",V.Local.sGridViewSelectedRows)
+			
+			F.Intrinsic.Control.For(V.Local.iCount,V.Local.sGridViewSelectedRows.UBound,V.Local.sGridViewSelectedRows.LBound,-1)
+				F.Data.DataTable.DeleteRow("2003Validate$2003File",V.Local.sGridViewSelectedRows(V.Local.iCount))
+			F.Intrinsic.Control.Next(V.Local.iCount)
+			
+		F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.gsGridManualEntry2003_RowCellClick.End
+
+Program.Sub.F_ManualEntry2003_UnLoad.Start
+F.Intrinsic.Control.Try	
+
+	'Call other screen unload to reset previous screen and set unload variable to true
+	F.Intrinsic.Control.CallSub(2003Mode_UnLoad)
+	
+	'Closing the 2003Validate table will close all views, child datatables, and child datatable views associated with it.
+	F.Data.DataTable.Close("2003Validate")
+	'Delete the rows from 2003 and 2003File to prevent duplicate data from being entered
+	F.Data.DataTable.DeleteRow("2003")
+	F.Data.DataTable.DeleteRow("2003File")
+	Gui.F_ManualEntry2003..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.F_ManualEntry2003_UnLoad.End
+
+Program.Sub.cmd2003Go_Click.Start
+F.Intrinsic.Control.Try
+
+	'Just need to hide the screen to continue.
+	Gui.2003Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmd2003Go_Click.End
+
+Program.Sub.2003Mode_UnLoad.Start
+F.Intrinsic.Control.Try
+	'Set unload variable to true
+	V.Global.b2003Closed.Set(True)
+	
+	'Clear items so that the program doesn't add any test data to the datatable.
+	Gui.2003Mode.ddl2003Mode.ClearItems
+	Gui.2003Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2003Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2003Mode_UnLoad.End
+
+Program.Sub.CatchError2003Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 2003Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError2003Validate.End

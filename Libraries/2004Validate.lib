@@ -1,0 +1,618 @@
+Program.Sub.ScreenSU.Start
+Gui.2004_Mode..Create
+Gui.2004_Mode..Caption("Select Options")
+Gui.2004_Mode..Size(4860,3525)
+Gui.2004_Mode..MinX(0)
+Gui.2004_Mode..MinY(0)
+Gui.2004_Mode..Position(0,0)
+Gui.2004_Mode..BackColor(-2147483633)
+Gui.2004_Mode..MousePointer(0)
+Gui.2004_Mode..Event(UnLoad,2004_Mode_UnLoad)
+Gui.2004_Mode..Sizeable(False)
+Gui.2004_Mode..MaxButton(False)
+Gui.2004_Mode..MinButton(False)
+Gui.2004_Mode.chk2004AllFlags.Create(CheckBox)
+Gui.2004_Mode.chk2004AllFlags.Size(1560,360)
+Gui.2004_Mode.chk2004AllFlags.Position(2040,210)
+Gui.2004_Mode.chk2004AllFlags.Caption("All Flags")
+Gui.2004_Mode.chk2004AllFlags.Event(Click,chk2004AllFlags_Click)
+Gui.2004_Mode.chk2004PrintLabelsFlag.Create(CheckBox)
+Gui.2004_Mode.chk2004PrintLabelsFlag.Size(1770,360)
+Gui.2004_Mode.chk2004PrintLabelsFlag.Position(2040,960)
+Gui.2004_Mode.chk2004PrintLabelsFlag.Caption("Print Labels Flag")
+Gui.2004_Mode.chk2004PrintLabelsFlag.Event(Click,2004ValueCheckFlags)
+Gui.2004_Mode.chk2004UpdateInventoryFlag.Create(CheckBox)
+Gui.2004_Mode.chk2004UpdateInventoryFlag.Size(2115,360)
+Gui.2004_Mode.chk2004UpdateInventoryFlag.Position(2040,1335)
+Gui.2004_Mode.chk2004UpdateInventoryFlag.Caption("Update Inventory Flag")
+Gui.2004_Mode.chk2004UpdateInventoryFlag.Event(Click,2004ValueCheckFlags)
+Gui.2004_Mode.chk2004CloseWOFlag.Create(CheckBox)
+Gui.2004_Mode.chk2004CloseWOFlag.Size(2130,360)
+Gui.2004_Mode.chk2004CloseWOFlag.Position(2040,585)
+Gui.2004_Mode.chk2004CloseWOFlag.Caption("Close Work Order Flag")
+Gui.2004_Mode.chk2004CloseWOFlag.Event(Click,2004ValueCheckFlags)
+Gui.2004_Mode.cmdGo2004.Create(Button)
+Gui.2004_Mode.cmdGo2004.Size(1245,345)
+Gui.2004_Mode.cmdGo2004.Position(1650,2460)
+Gui.2004_Mode.cmdGo2004.Caption("Go")
+Gui.2004_Mode.cmdGo2004.Event(Click,cmdGo2004_Click)
+Gui.2004_Mode.chk2004AllActions.Create(CheckBox)
+Gui.2004_Mode.chk2004AllActions.Size(1635,360)
+Gui.2004_Mode.chk2004AllActions.Position(270,210)
+Gui.2004_Mode.chk2004AllActions.DefaultValue("")
+Gui.2004_Mode.chk2004AllActions.Caption("All Actions")
+Gui.2004_Mode.chk2004AllActions.Event(Click,chk2004AllActions_Click)
+Gui.2004_Mode.chk2004ActionBlank.Create(CheckBox)
+Gui.2004_Mode.chk2004ActionBlank.Size(1560,360)
+Gui.2004_Mode.chk2004ActionBlank.Position(270,585)
+Gui.2004_Mode.chk2004ActionBlank.Caption("Blank - Normal")
+Gui.2004_Mode.chk2004ActionBlank.Event(Click,2004ValueCheckActions)
+Gui.2004_Mode.chk2004ActionR.Create(CheckBox)
+Gui.2004_Mode.chk2004ActionR.Size(1560,360)
+Gui.2004_Mode.chk2004ActionR.Position(270,960)
+Gui.2004_Mode.chk2004ActionR.Caption("R - Reverse")
+Gui.2004_Mode.chk2004ActionR.Event(Click,2004ValueCheckActions)
+Gui.2004_Mode.chk2004ActionA.Create(CheckBox)
+Gui.2004_Mode.chk2004ActionA.Size(1725,360)
+Gui.2004_Mode.chk2004ActionA.Position(270,1335)
+Gui.2004_Mode.chk2004ActionA.Caption("A - Auto Reverse")
+Gui.2004_Mode.chk2004ActionA.Event(Click,2004ValueCheckActions)
+Gui.2004_Mode.lbl2004Screen.Create(Label,"Screen Mode",True,1200,255,0,540,1770,True,0,"Arial",8,-2147483633,0)
+Gui.2004_Mode.ddl2004Screen.Create(DropDownList)
+Gui.2004_Mode.ddl2004Screen.Size(2115,330)
+Gui.2004_Mode.ddl2004Screen.Position(105,1980)
+Gui.2004_Mode.ddl2004CostingMethod.Create(DropDownList)
+Gui.2004_Mode.ddl2004CostingMethod.Size(2115,330)
+Gui.2004_Mode.ddl2004CostingMethod.Position(2355,1980)
+Gui.2004_Mode.lbl2004CostingMethod.Create(Label,"Costing Method",True,1425,255,0,2805,1770,True,0,"Arial",8,-2147483633,0)
+
+Gui.F_ManualEntry2004..Create
+Gui.F_ManualEntry2004..Caption("Manual Data Entry")
+Gui.F_ManualEntry2004..Size(20760,8505)
+Gui.F_ManualEntry2004..MinX(0)
+Gui.F_ManualEntry2004..MinY(0)
+Gui.F_ManualEntry2004..Position(0,0)
+Gui.F_ManualEntry2004..BackColor(-2147483633)
+Gui.F_ManualEntry2004..MousePointer(0)
+Gui.F_ManualEntry2004..MaxButton(False)
+Gui.F_ManualEntry2004..Sizeable(False)
+Gui.F_ManualEntry2004..Event(UnLoad,F_ManualEntry2004_UnLoad)
+Gui.F_ManualEntry2004.gsGridManualEntry2004.Create(GsGridControl)
+Gui.F_ManualEntry2004.gsGridManualEntry2004.Size(20070,7020)
+Gui.F_ManualEntry2004.gsGridManualEntry2004.Position(195,300)
+Gui.F_ManualEntry2004.gsGridManualEntry2004.Event(RowCellClick,gsGridManualEntry2004_RowCellClick)
+Gui.F_ManualEntry2004.cmdRunTest2004.Create(Button)
+Gui.F_ManualEntry2004.cmdRunTest2004.Size(1485,375)
+Gui.F_ManualEntry2004.cmdRunTest2004.Position(180,7410)
+Gui.F_ManualEntry2004.cmdRunTest2004.Caption("Run Test")
+Gui.F_ManualEntry2004.cmdRunTest2004.Event(Click,cmd2004RunTest_Click)
+Program.Sub.ScreenSU.End
+
+'This library helps with the use of the 2004 Call wrapper, WIP to FG (JB0052GI). To use it, simply fill out the 2004 datatable with the data for a single call to the call wrapper for each row.
+'If you need to create a file you can also fill out the 2004File datatable. This datatable links back to the 2004 datatable on Work Order and Work Order Suffix. For each line in the file
+'add a row to the 2004File datatable. The file will be created for you when one of the library functions is called. Once done, call either 2004Sync or 2004Async to have the call wrapper run on each row. 
+'The 2004 datatable is structed as follows:
+'Column					=	Parameter										=	Possible Values
+'=======================================================================================================================
+'CompanyCode			=	Company Code									=	Defaults to V.Caller.CompanyCode
+'Terminal				=	Terminal										=	Defaults to V.Caller.Terminal
+'CallingProgram			=	Calling Program									=	Defaults to V.Caller.Caller
+'Mode					=	Mode											=	"NS" - Screenless Mode
+'																			=	"OS" - Open Screen Mode
+'DtlWO					=	Dtl Work Order (used for action "R")			=	X(6)
+'DtlWOSuffix			=	Dtl Work Order Suffix (used for action "R")		=	X(3)
+'DtlWOSeq				=	Dtl Work Order Sequence (used for action "R")	=	X(6)
+'DtlFill				=	Dtl Fill (used for action "R")					=	X(1)
+'DtlDate				=	Dtl Date (used for action "R")					=	MMDDYY
+'DtlKeySeq				=	Dtl Key Seq (used for action "R")				=	X(4)
+'WO						=	Work Order										=	X(6)
+'WOSuffix				=	Work Order Suffix								=	X(3)
+'XferYear				=	Transfer Year									=	YYYY
+'XferMonth				=	Transfer Month									=	MM
+'XferDay				=	Transfer Day									=	DD
+'CloseWOFlag			=	Close Work Order Flag							=	Y/N
+'PartDesc				=	Part Description								=	X(30)
+'Qty					=	Quantity										=	8.4
+'Cost					=	Cost											=	8.4
+'Price					=	Price											=	8.4
+'PrintLabelsFlag		=	Print Labels Flag								=	Y/N
+'CostAction				=	Costing Action									=	"E" - Estimate
+'																			=	"P" - Percentage
+'																			=	"I" - Inventory
+'																			=	"L" - Alternate
+'																			=	"A" - Actual
+'																			=	"R" - Remaining
+'																			=	"U" - Manual
+'UpdateInventoryFlag	=	Update Inventor Flag							=	Y/N
+'InventoryDebitAccount	=	Inventory Debit Account							=	X(15)
+'FileName				=	File Name										=	Defaults to \Global\Files\cccttt2004.txt
+'Action					=	Action											=	" " - Normal
+'																			=	"R" - Reverse
+'																			=	"A" - Auto Reverse
+'=======================================================================================================================
+'
+'The 2004File datatable is structed as follows:
+'Column		=	Parameter			=	Possible Values
+'=======================================================================================================================
+'WO			=	Work Order			=	X(6) - Lines up with work order number for related call in 2004 datatable
+'WOSuffix	=	Work Order Suffix	=	X(3) - Lines up with work order suffix for related call in 2004 datatable
+'Lot		=	Lot Number			=	X(15)
+'Bin		=	Bin Number			=	X(6)
+'Heat		=	Heat Number			=	X(15)
+'Serial		=	Serial Number		=	X(30)
+'Qty		=	Quantity			=	8.4
+'ExpDate	=	Expiration Date		=	YYYYMMDD
+'Warranty	=	WarrantyMonths		=	9(3)
+'UserField1	=	User Field 1		=	X(15)
+'UserField2	=	User Field 2		=	X(15)
+'UserField3	=	User Field 3		=	X(15)
+'UserField4	=	User Field 4		=	X(15)
+'UserField5	=	User Field 5		=	X(15)
+'UserField6	=	User Field 6		=	X(15)
+'UserField7	=	User Field 7		=	X(15)
+'UserField8	=	User Field 8		=	X(15)
+'UserField9	=	User Field 9		=	X(15)
+'=======================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.b2004Closed.Declare(Boolean)
+Program.Sub.Preflight.End
+
+Program.Sub.2004Validate.Start
+F.Intrinsic.Control.Try
+	V.Local.sLabels.Declare(String,"N")
+	V.Local.sInventory.Declare(String,"N")
+	V.Local.sClose.Declare(String,"N")	
+	V.Local.sScreen.Declare(String)
+	V.Local.sMethod.Declare(String)
+	
+	'Set closed to false so repeat tests don't remember last test's value
+	V.Global.b2004Closed.Set(False)
+	
+	F.Intrinsic.Control.If(V.Caller.Switches,<>,"M")
+		'Configure drop down lists
+		Gui.2004_Mode.ddl2004Screen.ClearItems
+		Gui.2004_Mode.ddl2004Screen.AddItem("NS - Screenless Mode")
+		Gui.2004_Mode.ddl2004Screen.AddItem("OS - Open Screen Mode")
+		Gui.2004_Mode.ddl2004Screen.Text("NS - Screenless Mode")
+		
+		gui.2004_Mode.ddl2004CostingMethod.ClearItems
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("E - Estimate")
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("P - Percentage")
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("I - Inventory")
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("L - Alternate")
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("A - Actual")
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("R - Remaining")
+		gui.2004_Mode.ddl2004CostingMethod.AddItem("U - Manual")
+		gui.2004_Mode.ddl2004CostingMethod.Text("E - Estimate")
+			
+		Gui.2004_Mode..Show
+		Gui.2004_Mode..WaitForDismiss
+		
+		F.Intrinsic.Control.If(V.Global.b2004Closed.Not)
+			'Configure flags, screen mode, and costing Action as set on screen
+			F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004PrintLabelsFlag.Value,=,1)
+				V.Local.sLabels.Set("Y")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004UpdateInventoryFlag.Value,=,1)
+				V.Local.sInventory.Set("Y")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004CloseWOFlag.Value,=,1)
+				V.Local.sClose.Set("Y")
+			F.Intrinsic.Control.EndIf
+			
+			V.Local.sScreen.Set(V.Screen.2004_Mode!ddl2004Screen.Value.Left2)
+			
+			V.Local.sMethod.Set(V.Screen.2004_Mode!ddl2004CostingMethod.Value.Left1)
+				
+			'Add test data
+			F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004ActionBlank.Value,=,1)
+				F.Data.DataTable.AddRow("2004","Mode",V.Local.sScreen,"WO","000155","WOSuffix","001","XferYear","2020","XferMonth","01","XferDay","01","CloseWOFlag",V.Local.sClose,"PartDesc","CAT ILDER","Qty","10","Cost","100","Price","150","PrintLabelsFlag",V.Local.sLabels,"CostMethod",V.Local.sMethod,"UpdateInventoryFlag",V.Local.sInventory,"InventoryDebitAccount","100","Action"," ")
+				F.Data.DataTable.AddRow("2004File","WO","000155","WOSuffix","001","Lot","987654","Bin","A00001","Heat","9898","Serial","Test serial","Qty","10","ExpDate","20210101","Warranty","12","UserField1","User field 1","UserField2","User field 2","UserField3","User field 3","UserField4","User field 4","UserField5","User field 5","UserField6","User field 6","UserField7","User field 7","UserField8","User field 8","UserField9","User field 9")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004ActionR.Value,=,1)
+				F.Data.DataTable.AddRow("2004","Mode",V.Local.sScreen,"DtlWO","000155","DtlWOSuffix","001","DtlWOSeq","999999","DtlFill","","DtlDate","200101","DtlKeySeq","0000","WO","000155","WOSuffix","001","CloseWOFlag",V.Local.sClose,"Qty","10","PrintLabelsFlag",V.Local.sLabels,"UpdateInventoryFlag",V.Local.sInventory,"Action","R")
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004ActionA.Value,=,1)
+				F.Data.DataTable.AddRow("2004","Mode",V.Local.sScreen,"DtlWO","000155","DtlWOSuffix","001","DtlWOSeq","999999","DtlFill","","DtlDate","200101","DtlKeySeq","0001","WO","000155","WOSuffix","001","CloseWOFlag",V.Local.sClose,"Qty","10","PrintLabelsFlag",V.Local.sLabels,"UpdateInventoryFlag",V.Local.sInventory,"Action","A")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Else
+		'Add rows for the datatables so that they don't have to add one initially
+		F.Data.DataTable.AddRow("2004")
+		F.Data.DataTable.AddRow("2004File")
+	F.Intrinsic.Control.EndIf	
+	
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O","OR",V.Caller.Switches,=,"M")
+    	
+    	'This prevents the second manual data entry screen from appearing if the first screen is unloaded
+    	F.Intrinsic.Control.If(V.Global.b2004Closed.Not)
+    	
+    		F.Intrinsic.Control.CallSub(LoadManualDataEntry2004)
+    		
+			F.Data.DataTable.DeleteRow("2004")
+			F.Data.DataTable.DeleteRow("2004File")
+			
+			Gui.F_ManualEntry2004..WaitForDismiss
+			
+    	F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.Global.b2004Closed.Not)		
+		F.Intrinsic.Control.CallSub(2004_Mode_UnLoad)
+		F.Intrinsic.Control.CallSub(2004Sync)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004Validate.End
+
+'Runs when check all flags button is clicked. If check all is checked, all other flags are checked. If it is unchecked, all other flags are unchecked.
+Program.Sub.chk2004AllFlags_Click.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.BlockEvents
+	
+	F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004AllFlags.Value,=,0)
+		F.Intrinsic.Control.CallSub(2004UnCheckAllFlags)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(2004CheckAllFlags)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.UnBlockEvents	
+	
+	'Set focus to reset the click events. Without this you have to double click.
+	Gui.2004_Mode.cmdGo2004.SetFocus
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.chk2004AllFlags_Click.End
+
+'Runs when check all Actions button is clicked. If check all is checked, all other Actions are checked. If it is unchecked, all other Actions are unchecked.
+Program.Sub.chk2004AllActions_Click.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.BlockEvents
+	
+	F.Intrinsic.Control.If(V.Screen.2004_Mode!chk2004AllActions.Value,=,0)
+		F.Intrinsic.Control.CallSub(2004UnCheckAllActions)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(2004CheckAllActions)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.UnBlockEvents	
+	
+	'Set focus to reset the click events. Without this you have to double click.
+	Gui.2004_Mode.cmdGo2004.SetFocus
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.chk2004AllActions_Click.End
+
+'Runs when a Action box is checked that is not the check all Actions box. This sub just unchecks the check all Actions box if it is checked and another Action box is unchecked.
+Program.Sub.2004ValueCheckActions.Start
+F.Intrinsic.Control.Try
+
+	'Block events from firing in this event
+	F.Intrinsic.Control.BlockEvents
+	
+	F.Intrinsic.Control.If(V.Screen.[V.Args.ControlName].Value,=,0)
+		gui.2004_Mode.chk2004AllActions.Value(0)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.UnBlockEvents
+	
+ 	'Set focus to reset the click events. Without this you have to double click.
+	Gui.2004_Mode.cmdGo2004.SetFocus
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004ValueCheckActions.End
+
+'Runs when a flag box is checked that is not the check all flags box. This sub just unchecks the check all flags box if it is checked and another flag box is unchecked.
+Program.Sub.2004ValueCheckFlags.Start
+F.Intrinsic.Control.Try
+
+	'Block events from firing in this event
+	F.Intrinsic.Control.BlockEvents
+	
+	F.Intrinsic.Control.If(V.Screen.[V.Args.ControlName].Value,=,0)
+		Gui.2004_Mode.chk2004AllFlags.Value(0)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.UnBlockEvents
+	
+ 	'Set focus to reset the click events. Without this you have to double click.
+	Gui.2004_Mode.cmdGo2004.SetFocus
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004ValueCheckFlags.End
+
+'Checks all Action boxes
+Program.Sub.2004CheckAllActions.Start
+F.Intrinsic.Control.Try
+	gui.2004_Mode.chk2004AllActions.Value(1)
+	gui.2004_Mode.chk2004ActionBlank.Value(1)
+	gui.2004_Mode.chk2004ActionR.Value(1)
+	gui.2004_Mode.chk2004ActionA.Value(1)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004CheckAllActions.End
+
+'Unchecks all Action boxes
+Program.Sub.2004UnCheckAllActions.Start
+F.Intrinsic.Control.Try
+	gui.2004_Mode.chk2004AllActions.Value(0)
+	gui.2004_Mode.chk2004ActionBlank.Value(0)
+	gui.2004_Mode.chk2004ActionR.Value(0)
+	gui.2004_Mode.chk2004ActionA.Value(0)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004UnCheckAllActions.End
+
+'Checks all flag boxes
+Program.Sub.2004CheckAllFlags.Start
+F.Intrinsic.Control.Try
+	Gui.2004_Mode.chk2004AllFlags.Value(1)
+	gui.2004_Mode.chk2004CloseWOFlag.Value(1)
+	gui.2004_Mode.chk2004PrintLabelsFlag.Value(1)
+	gui.2004_Mode.chk2004UpdateInventoryFlag.Value(1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004CheckAllFlags.End
+
+'Unchecks all flag boxes
+Program.Sub.2004UnCheckAllFlags.Start
+F.Intrinsic.Control.Try
+	Gui.2004_Mode.chk2004AllFlags.Value(0)
+	gui.2004_Mode.chk2004CloseWOFlag.Value(0)
+	gui.2004_Mode.chk2004PrintLabelsFlag.Value(0)
+	gui.2004_Mode.chk2004UpdateInventoryFlag.Value(0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004UnCheckAllFlags.End
+
+'Hides the form. This causes Main to start running after the  Gui.2004_Mode..WaitForDismiss line
+Program.Sub.cmdGo2004_Click.Start
+F.Intrinsic.Control.Try
+	
+	Gui.2004_Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdGo2004_Click.End
+
+Program.Sub.LoadManualDataEntry2004.Start
+F.Intrinsic.Control.Try
+	'Create main DT for grid which will contain the subgrids for each table in 2004.lib.
+	F.Data.DataTable.Create("2004Validate",True)
+	F.Data.DataTable.AddColumn("2004Validate","TableName","String")
+	F.Data.DataTable.AddColumn("2004Validate","AddButton","String")
+	F.Data.DataTable.AddColumn("2004Validate","RemoveButton","String")
+	F.Data.DataTable.AddRow("2004Validate","TableName","2004")
+	F.Data.DataTable.AddRow("2004Validate","TableName","2004File")
+	
+	F.Data.DataView.Create("2004","2004View",22)
+	F.Data.DataView.ToDataTable("2004","2004View","2004Validate$2004")
+	F.Data.DataView.Close("2004","2004View")
+	
+	F.Data.DataView.Create("2004File","2004FileView",22)
+	F.Data.DataView.ToDataTable("2004File","2004FileView","2004Validate$2004File")
+	F.Data.DataView.Close("2004File","2004FileView")
+	
+	'Add temporary column to lib datatables to link them to the main gsgc DT
+	F.Data.DataTable.AddColumn("2004Validate$2004","TableName","String","2004")
+	F.Data.DataTable.AddColumn("2004Validate$2004File","TableName","String","2004File")
+	
+	'Add relation between main gsgc DT and the DTs we are working with
+	F.Data.DataTable.AddRelation("2004Validate","TableName","2004Validate$2004","TableName")
+	F.Data.DataTable.AddRelation("2004Validate","TableName","2004Validate$2004File","TableName")
+	
+	'Generate dataviews of tables to be used by grid controls
+	F.Data.DataView.Create("2004Validate","2004ValidateView",22)
+	F.Data.DataView.Create("2004Validate$2004","2004View",22)
+	F.Data.DataView.Create("2004Validate$2004File","2004FileView",22)
+	'Call initialize screen (build style for gsgc)
+	F.Intrinsic.Control.CallSub(InitializeScreen2004)
+	
+	Gui.F_ManualEntry2004..Show
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadManualDataEntry2004.End
+
+Program.Sub.InitializeScreen2004.Start
+F.Intrinsic.Control.Try
+	V.Local.sFieldNames.Declare(String)
+	V.Local.bFiller.Declare(Boolean)
+	V.Local.iCount.Declare(Long)
+
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.AddGridviewFromDataview("2004ValidateGridView","2004Validate","2004ValidateView")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.AddGridviewFromDataview("2004GridView","2004Validate","2004View")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.AddGridviewFromDataview("2004FileGridView","2004Validate","2004FileView")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.MainView("2004ValidateGridView")
+	
+	'2004Validate
+	'Captions
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","TableName","Caption","Table")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","AddButton","Caption","Add")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","RemoveButton","Caption","Remove")
+	'Center
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","AddButton","HeaderHAlignment","Center")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","RemoveButton","HeaderHAlignment","Center")
+	'ColumnEdit (buttons)
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.ColumnEdit("2004ValidateGridView","AddButton","EditorButton","Add New Row")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.ColumnEdit("2004ValidateGridView","RemoveButton","EditorButton","Remove Selected Row")
+	GUi.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","AddButton","AllowEdit","False")
+	GUi.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","AddButton","ReadOnly","True")
+	GUi.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","RemoveButton","AllowEdit","False")
+	GUi.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","RemoveButton","ReadOnly","True")	
+	'Widths
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","AddButton","MinWidth","80")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","AddButton","MaxWidth","80")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","RemoveButton","MinWidth","120")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004ValidateGridView","RemoveButton","MaxWidth","120")
+	
+	'2004GridView
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004GridView","TableName","Visible","False")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetGridviewProperty("2004GridView","ReadOnly","False")
+
+	'Column Widths
+	F.Intrinsic.String.Split(V.DataTable.2004Validate$2004.FieldNames,"*!*",V.Local.sFieldNames)
+
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.Local.sFieldNames.UBound,1)
+		F.Intrinsic.String.IsInString(V.Local.sFieldNames(V.Local.iCount),"Filler",True,V.Local.bFiller)
+		
+		F.Intrinsic.Control.If(V.Local.bFiller)
+			Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004GridView",V.Local.sFieldNames(V.Local.iCount),"Visible","False")
+		F.Intrinsic.Control.Else
+			Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004GridView",V.Local.sFieldNames(V.Local.iCount),"MinWidth","100")
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Next(V.Local.iCount)
+
+	'2004FileGridView
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004FileGridView","TableName","Visible","False")
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetGridviewProperty("2004FileGridView","ReadOnly","False")
+	
+	'Column Widths
+	F.Intrinsic.String.Split(V.DataTable.2004Validate$2004File.FieldNames,"*!*",V.Local.sFieldNames)
+
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.Local.sFieldNames.UBound,1)
+		F.Intrinsic.String.IsInString(V.Local.sFieldNames(V.Local.iCount),"Filler",True,V.Local.bFiller)
+		
+		F.Intrinsic.Control.If(V.Local.bFiller)
+			Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004FileGridView",V.Local.sFieldNames(V.Local.iCount),"Visible","False")
+		F.Intrinsic.Control.Else
+			Gui.F_ManualEntry2004.gsGridManualEntry2004.SetColumnProperty("2004FileGridView",V.Local.sFieldNames(V.Local.iCount),"MinWidth","100")
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	'Expand Views
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.ExpandMasterRow("2004ValidateGridView",0)
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.ExpandMasterRow("2004ValidateGridView",1)
+	
+	'Enable appearance row
+	Gui.F_ManualEntry2004.gsGridManualEntry2004.SetGridviewProperty("2004ValidateGridView","EnableAppearanceOddRow","True")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.InitializeScreen2004.End
+
+Program.Sub.cmd2004RunTest_Click.Start
+F.Intrinsic.Control.Try
+
+	F.Data.DataTable.AcceptChanges("2004Validate$2004")
+	F.Data.DataTable.AcceptChanges("2004Validate$2004File")
+	F.Data.DataTable.Merge("2004Validate$2004","2004",True,2)
+	F.Data.DataTable.Merge("2004Validate$2004File","2004File",True,2)
+	F.Data.DataTable.Close("2004Validate")
+	Gui.F_ManualEntry2004..Visible(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmd2004RunTest_Click.End
+
+'Runs every time a cell is clicked - used for add and remove buttons
+Program.Sub.gsGridManualEntry2004_RowCellClick.Start
+F.Intrinsic.Control.Try
+	V.Local.sGridViewSelectedRows.Declare(String)
+	V.Local.iCount.Declare(Long)
+	
+	'For add button, just add a row to the DT after checking which add button was checked
+	F.Intrinsic.Control.If(V.Args.Column.LCase,=,"addbutton")
+	
+		F.Intrinsic.Control.If(V.Args.RowIndex,=,0)
+			F.Data.DataTable.AddRow("2004Validate$2004")
+		F.Intrinsic.Control.ElseIf(V.Args.RowIndex,=,1)
+			F.Data.DataTable.AddRow("2004Validate$2004File")
+		F.Intrinsic.Control.EndIf
+		
+	'for remove button, check which remove button is clicked, then retrieve the active selected rows from the previously selected grid view (since clicking the button changes the current row of the gsgc).
+	'Then split out the rows in case multiple are selected and for each remove that row from the DT (we work from the high number down to prevent issues with the row numbers changing after a row is removed).		
+	F.Intrinsic.Control.ElseIf(V.Args.Column.LCase,=,"removebutton")
+		
+		F.Intrinsic.Control.If(V.Args.RowIndex,=,0,"AND",V.DataTable.2004Validate$2004.RowCount,>,0)
+			
+			Gui.F_ManualEntry2004.gsGridManualEntry2004.GetSelectedRows("2004GridView",V.Local.sGridViewSelectedRows)
+			F.Intrinsic.String.Split(V.Local.sGridViewSelectedRows,"*!*",V.Local.sGridViewSelectedRows)
+			
+			F.Intrinsic.Control.For(V.Local.iCount,V.Local.sGridViewSelectedRows.UBound,V.Local.sGridViewSelectedRows.LBound,-1)
+				F.Data.DataTable.DeleteRow("2004Validate$2004",V.Local.sGridViewSelectedRows(V.Local.iCount))
+			F.Intrinsic.Control.Next(V.Local.iCount)
+			
+		F.Intrinsic.Control.ElseIf(V.Args.RowIndex,=,1,"AND",V.DataTable.2004Validate$2004File.RowCount,>,0)
+		
+			Gui.F_ManualEntry2004.gsGridManualEntry2004.GetSelectedRows("2004FileGridView",V.Local.sGridViewSelectedRows)
+			F.Intrinsic.String.Split(V.Local.sGridViewSelectedRows,"*!*",V.Local.sGridViewSelectedRows)
+			
+			F.Intrinsic.Control.For(V.Local.iCount,V.Local.sGridViewSelectedRows.UBound,V.Local.sGridViewSelectedRows.LBound,-1)
+				F.Data.DataTable.DeleteRow("2004Validate$2004File",V.Local.sGridViewSelectedRows(V.Local.iCount))
+			F.Intrinsic.Control.Next(V.Local.iCount)
+			
+		F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.gsGridManualEntry2004_RowCellClick.End
+
+Program.Sub.F_ManualEntry2004_UnLoad.Start
+F.Intrinsic.Control.Try
+
+	'Call other screen unload to uncheck checkboxes and set unload variable to true
+	F.Intrinsic.Control.CallSub(2004_Mode_UnLoad)
+	
+	Gui.F_ManualEntry2004..Visible(False)
+	
+	'Delete rows from datatables to prevent duplicate data from being entered
+	F.Data.DataTable.DeleteRow("2004")
+	F.Data.DataTable.DeleteRow("2004File")
+	
+	F.Data.DataTable.Close("2004Validate")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.F_ManualEntry2004_UnLoad.End
+
+'Unchecks every box then hides the screen. This prevents the tests from running if a box is checked and then the program is closed.
+Program.Sub.2004_Mode_UnLoad.Start
+F.Intrinsic.Control.Try
+	
+	V.Global.b2004Closed.Set(True)
+	
+	F.Intrinsic.Control.BlockEvents
+	F.Intrinsic.Control.CallSub(2004UnCheckAllFlags)
+	F.Intrinsic.Control.CallSub(2004UnCheckAllActions)
+	F.Intrinsic.Control.UnBlockEvents
+	
+	Gui.2004_Mode..Visible(False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004_Mode_UnLoad.End
+
+Program.Sub.CatchError2004Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 2004Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError2004Validate.End

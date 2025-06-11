@@ -1,0 +1,72 @@
+'This library helps with the use of the 1500 Call wrapper, Reprice Routers (RE0071CW). To use it, simply fill out the 1500 datatable with the router and quantity for each row of the input file.
+'Then call either 1500Sync or 1500Async to have the library create the input file and run the callwrapper to generate the output file. V.Global.s1500InputFile and V.Global.s1500OutputFile can
+'be set if you need to set the input and output files, however they default to F.Intrinsic.String.Build("{0}\{1}{2}PRICING.IN",V.Caller.FilesDir,V.Caller.User.Trim,V.Caller.Terminal,V.Global.s1500InputFile)
+'and F.Intrinsic.String.Build("{0}\{1}{2}PRICING.OUT",V.Caller.FilesDir,V.Caller.User.Trim,V.Caller.Terminal,V.Global.s1500OutputFile) if you don't set them yourself.
+'The datatable is structed as follows:
+'Column		=	Parameter				=	Possible Values
+'================================================================================================================
+'Router		=	Router for input file	=	Router
+'Quantity	=	quantity for input file	=	Float
+'================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s1500Error.Declare(String)
+V.Global.s1500InputFile.Declare(String)
+V.Global.s1500OutputFile.Declare(String)
+F.Intrinsic.String.Build("{0}\{1}{2}PRICING.IN",V.Caller.FilesDir,V.Caller.User.Trim,V.Caller.Terminal,V.Global.s1500InputFile)
+F.Intrinsic.String.Build("{0}\{1}{2}PRICING.OUT",V.Caller.FilesDir,V.Caller.User.Trim,V.Caller.Terminal,V.Global.s1500OutputFile)
+
+F.Data.DataTable.Create("1500",True)
+F.Data.DataTable.AddColumn("1500","Router","String")
+F.Data.DataTable.AddColumn("1500","Quantity","Float")
+Program.Sub.Preflight.End
+
+Program.Sub.1500.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.sFileContent.Declare(String)
+	
+	'First we need to create the file from the datatable. This is done by creating a dataview of the datatable and using the DataView.ToString method w/ the String2File method
+	F.Intrinsic.Control.If(V.DataTable.1500.RowCount,>,0)
+		F.Data.DataView.Create("1500","1500View",22)
+		F.Data.DataView.ToString("1500","1500View","*!*",V.Ambient.NewLine,V.Local.sFileContent)
+		F.Intrinsic.File.String2File(V.Global.s1500InputFile,V.Local.sFileContent)
+		
+		'Now we need to call the callwrapper according to how the programmer called
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.Global.s1500InputFile,V.Global.s1500OutputFile,V.Local.sParams)
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(1500,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(1500,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+	F.Intrinsic.Control.EndIf
+	
+	F.Data.DataTable.DeleteRow("1500")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1500,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.1500.End
+
+'Calls 1500 with callwrapper type of 0
+Program.Sub.1500Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(1500,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1500, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.1500Sync.End
+
+'Calls 1500 with callwrapper type of 1
+Program.Sub.1500Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(1500,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1500, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.1500Async.End
+
+Program.Sub.CatchError1500.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s1500Error)
+Program.Sub.CatchError1500.End

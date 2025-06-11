@@ -1,0 +1,208 @@
+Program.Sub.ScreenSU.Start
+Gui.1010Mode..Create
+Gui.1010Mode..Caption("Select Options")
+Gui.1010Mode..Size(3915,4455)
+Gui.1010Mode..MinX(0)
+Gui.1010Mode..MinY(0)
+Gui.1010Mode..Position(0,0)
+Gui.1010Mode..BackColor(-2147483633)
+Gui.1010Mode..MaxButton(False)
+Gui.1010Mode..MinButton(False)
+Gui.1010Mode..MousePointer(0)
+Gui.1010Mode..Sizeable(False)
+Gui.1010Mode..Event(UnLoad,1010Mode_UnLoad)
+Gui.1010Mode.ddl1010Process.Create(DropDownList)
+Gui.1010Mode.ddl1010Process.Size(3165,330)
+Gui.1010Mode.ddl1010Process.Position(270,465)
+Gui.1010Mode.ddl1010Process.Event(Click,ddl1010Process_Change)
+Gui.1010Mode.lbl1010Process.Create(Label,"Process",True,885,255,0,255,240,True,0,"Arial",8,-2147483633,0)
+Gui.1010Mode.chk1010RefreshDescRaw.Create(CheckBox)
+Gui.1010Mode.chk1010RefreshDescRaw.Size(3435,360)
+Gui.1010Mode.chk1010RefreshDescRaw.Position(360,1680)
+Gui.1010Mode.chk1010RefreshDescRaw.Caption("Refresh Descriptions For Raw Materials")
+Gui.1010Mode.chk1010RefreshDescPar.Create(CheckBox)
+Gui.1010Mode.chk1010RefreshDescPar.Size(3345,360)
+Gui.1010Mode.chk1010RefreshDescPar.Position(360,2055)
+Gui.1010Mode.chk1010RefreshDescPar.Caption("Refresh Descriptions For Parent Parts")
+Gui.1010Mode.chk1010RefreshUM.Create(CheckBox)
+Gui.1010Mode.chk1010RefreshUM.Size(3015,360)
+Gui.1010Mode.chk1010RefreshUM.Position(360,2430)
+Gui.1010Mode.chk1010RefreshUM.Caption("Refresh Unit Of Measure Fields")
+Gui.1010Mode.chk1010RefreshSource.Create(CheckBox)
+Gui.1010Mode.chk1010RefreshSource.Size(2820,360)
+Gui.1010Mode.chk1010RefreshSource.Position(360,2805)
+Gui.1010Mode.chk1010RefreshSource.Caption("Refresh Source Code")
+Gui.1010Mode.cmd1010Go.Create(Button)
+Gui.1010Mode.cmd1010Go.Size(2415,375)
+Gui.1010Mode.cmd1010Go.Position(690,3330)
+Gui.1010Mode.cmd1010Go.Caption("Go")
+Gui.1010Mode.cmd1010Go.Event(Click,cmd1010Go_Click)
+Gui.1010Mode.ddl1010UpdateCost.Create(DropDownList)
+Gui.1010Mode.ddl1010UpdateCost.Size(3165,330)
+Gui.1010Mode.ddl1010UpdateCost.Position(285,1200)
+Gui.1010Mode.lbl1010UpdateCost.Create(Label,"Update Cost",True,1290,255,0,255,975,True,0,"Arial",8,-2147483633,0)
+Program.Sub.ScreenSU.End
+'This library helps with using the 1010 call wrapper (Update Inventory Description to BOM, program BM0050). To use it, simply add a row to the 1010 data table for each call to the call wrapper that you want to make. 
+'Then call either 1010Sync or 1010Async. The program will loop through the data table, combine the parameters as needed, and make a call to the call wrapper either syncronously or asyncronously according to which sub you called. 
+'The program will then remove all rows from the datatable.
+'The datatable is structed as follows:
+'Column						=	Parameter										=	Possible Values
+'================================================================================================================
+'Process					=	Process											=	01: Unit Cost Updates
+'																				=	02: Rebuild Browser Index
+'BegBOMParent				=	Beginning BOM Parent							=	######
+'BegBOMRev					=	Beginning BOM Rev								=	######
+'EndBOMParent				=	End BOM Parent									=	######
+'EndBOMRev					=	End BOM Rev										=	######
+'AllBOMs					=	All BOMs Flag									=	Y/N
+'UpdateCost					=	Update Cost										=	01: Zero Unit Cost For All Parents
+'																				=	02: No Change To Unit Cost For Any Parents
+'																				=	03: No Unit Cost Update
+'																				=	04: Update All Costs From Alt Cost
+'RefreshDescForRawMatl		=	Refresh Descriptions For Raw Materials Flag		=	Y/N
+'RefreshDescForParentParts	=	Refresh Descriptions For Parent Parts Flag		=	Y/N
+'RefreshUM					=	Refresh Unit Of Measure Fields Flag				=	Y/N
+'RefreshSource				=	Refresh Source Code Flag						=	Y/N
+Program.Sub.Preflight.Start
+V.Global.b1010Closed.Declare(Boolean)
+Program.Sub.Preflight.End
+
+Program.Sub.1010Validate.Start
+F.Intrinsic.Control.Try
+	V.Local.sRefreshDescRaw.Declare(String)
+	V.Local.sRefreshDescPar.Declare(String)
+	V.Local.sRefreshUM.Declare(String)
+	V.Local.sRefreshSource.Declare(String)
+	V.Local.sUpdateCost.Declare(String)
+	
+	V.Global.b1010Closed.Set(False)
+	
+	'Check to see if this was called by Manual Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,!=,"M")
+		'Add items to the drop down lists
+		Gui.1010Mode.ddl1010Process.AddItem("00: Both")
+		Gui.1010Mode.ddl1010Process.AddItem("01: Unit Cost Updates")
+		Gui.1010Mode.ddl1010Process.AddItem("02: Rebuild Browser Index")
+		Gui.1010Mode.ddl1010UpdateCost.AddItem("01: Zero Unit Cost For All Parents")
+		Gui.1010Mode.ddl1010UpdateCost.AddItem("02: No Change To Unit Cost For Any Parents")
+		Gui.1010Mode.ddl1010UpdateCost.AddItem("03: No Unit Cost Update")
+		Gui.1010Mode.ddl1010UpdateCost.AddItem("04: Update All Costs From Alt Cost")
+		Gui.1010Mode.ddl1010Process.Text("00: Both")
+		Gui.1010Mode.ddl1010UpdateCost.Text("01: Zero Unit Cost For All Parents")
+		Gui.1010Mode..Show
+		Gui.1010Mode..WaitForDismiss
+		
+		F.Intrinsic.Control.If(V.Global.b1010Closed.Not)
+		
+			'Add test data
+			F.Intrinsic.Control.If(V.Screen.1010Mode!ddl1010Process.Value,=,"00: Both","OR",V.Screen.1010Mode!ddl1010Process.Value,=,"01: Unit Cost Updates")
+				'Set the flags that the user selected
+				F.Intrinsic.Control.If(V.Screen.1010Mode!chk1010RefreshDescRaw.Value,=,1)
+					V.Local.sRefreshDescRaw.Set("Y")
+				F.Intrinsic.Control.EndIf
+				
+				F.Intrinsic.Control.If(V.Screen.1010Mode!chk1010RefreshDescPar.Value,=,1)
+					V.Local.sRefreshDescPar.Set("Y")
+				F.Intrinsic.Control.EndIf
+				
+				F.Intrinsic.Control.If(V.Screen.1010Mode!chk1010RefreshUM.Value,=,1)
+					V.Local.sRefreshUM.Set("Y")
+				F.Intrinsic.Control.EndIf
+				
+				F.Intrinsic.Control.If(V.Screen.1010Mode!chk1010RefreshSource.Value,=,1)
+					V.Local.sRefreshSource.Set("Y")
+				F.Intrinsic.Control.EndIf
+				
+				'Since we know that the Update Cost DDL has the correct mode in it, we can simply split on the : and set the value to whatever the number is
+				F.Intrinsic.String.Split(V.Screen.1010Mode!ddl1010UpdateCost.Value,":",V.Local.sUpdateCost)
+			
+				F.Data.DataTable.AddRow("1010","Process","01","BegBOMParent","210900","BegBOMRev","","EndBOMParent","210900-2","EndBOMRev","","AllBOMs","N","UpdateCost",V.Local.sUpdateCost(0),"RefreshDescForRawMatl",V.Local.sRefreshDescRaw,"RefreshDescForParentParts",V.Local.sRefreshDescPar,"RefreshUM",V.Local.sRefreshUM,"RefreshSource",V.Local.sRefreshSource)
+			F.Intrinsic.Control.EndIf
+			
+			F.Intrinsic.Control.If(V.Screen.1010Mode!ddl1010Process.Value,=,"00: Both","OR",V.Screen.1010Mode!ddl1010Process.Value,=,"02: Rebuild Browser Index")
+				F.Data.DataTable.AddRow("1010","Process","02","BegBOMParent","210900","BegBOMRev","","EndBOMParent","210900-2","EndBOMRev","","AllBOMs"," ","UpdateCost"," ","RefreshDescForRawMatl"," ","RefreshDescForParentParts"," ","RefreshUM"," ","RefreshSource"," ")
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O","AND",V.Global.b1010Closed,=,False)
+		F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed,=,False,"AND",V.Global.b1010Closed,=,False)
+		F.Intrinsic.Control.CallSub(1010Mode_Unload)
+		F.Intrinsic.Control.CallSub(1010Sync)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(1010Mode_Unload)
+		F.Data.DataTable.DeleteRow("1010")
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.1010Validate.End
+
+Program.Sub.ddl1010Process_Change.Start
+F.Intrinsic.Control.Try
+	
+	'If they select to Rebuild the Browser Index we need to lock the other options and uncheck them. Since it doesn't actually use them. Anything else they can be used.
+	F.Intrinsic.Control.If(V.Screen.1010Mode!ddl1010Process.Value,=,"02: Rebuild Browser Index")
+		Gui.1010Mode.chk1010RefreshDescPar.Value(0)
+		Gui.1010Mode.chk1010RefreshUM.Value(0)
+		Gui.1010Mode.chk1010RefreshSource.Value(0)
+		Gui.1010Mode.chk1010RefreshDescRaw.Value(0)
+		
+		Gui.1010Mode.ddl1010UpdateCost.Enabled(False)
+		Gui.1010Mode.chk1010RefreshDescPar.Enabled(False)
+		Gui.1010Mode.chk1010RefreshUM.Enabled(False)
+		Gui.1010Mode.chk1010RefreshSource.Enabled(False)
+		Gui.1010Mode.chk1010RefreshDescRaw.Enabled(False)
+	F.Intrinsic.Control.Else
+		Gui.1010Mode.ddl1010UpdateCost.Enabled(True)
+		Gui.1010Mode.chk1010RefreshDescPar.Enabled(True)
+		Gui.1010Mode.chk1010RefreshUM.Enabled(True)
+		Gui.1010Mode.chk1010RefreshSource.Enabled(True)
+		Gui.1010Mode.chk1010RefreshDescRaw.Enabled(True)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.ddl1010Process_Change.End
+
+Program.Sub.cmd1010Go_Click.Start
+F.Intrinsic.Control.Try
+
+	Gui.1010Mode..Visible(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmd1010Go_Click.End
+
+Program.Sub.1010Mode_UnLoad.Start
+F.Intrinsic.Control.Try
+	V.Global.b1010Closed.Set(True)
+	
+	Gui.1010Mode.chk1010RefreshDescPar.Value(0)
+	Gui.1010Mode.chk1010RefreshUM.Value(0)
+	Gui.1010Mode.chk1010RefreshSource.Value(0)
+	Gui.1010Mode.chk1010RefreshDescRaw.Value(0)
+	'Clear the items so that it doesn't add any test data.
+	Gui.1010Mode.ddl1010Process.ClearItems
+	Gui.1010Mode.ddl1010UpdateCost.ClearItems
+	Gui.1010Mode..Visible(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.1010Mode_UnLoad.End
+
+Program.Sub.CatchError1010Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 1010Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError1010Validate.End

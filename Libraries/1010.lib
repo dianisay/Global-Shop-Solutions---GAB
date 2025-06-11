@@ -1,0 +1,83 @@
+'This library helps with using the 1010 call wrapper (Update Inventory Description to BOM, program BM0050). To use it, simply add a row to the 1010 data table for each call to the call wrapper that you want to make. 
+'Then call either 1010Sync or 1010Async. The program will loop through the data table, combine the parameters as needed, and make a call to the call wrapper either syncronously or asyncronously according to which sub you called. 
+'The program will then remove all rows from the datatable.
+'The datatable is structed as follows:
+'Column						=	Parameter										=	Possible Values
+'================================================================================================================
+'Process					=	Process											=	01: Unit Cost Updates
+'																				=	02: Rebuild Browser Index
+'BegBOMParent				=	Beginning BOM Parent							=	######
+'BegBOMRev					=	Beginning BOM Rev								=	######
+'EndBOMParent				=	End BOM Parent									=	######
+'EndBOMRev					=	End BOM Rev										=	######
+'AllBOMs					=	All BOMs Flag									=	Y/N
+'UpdateCost					=	Update Cost										=	01: Zero Unit Cost For All Parents
+'																				=	02: No Change To Unit Cost For Any Parents
+'																				=	03: No Unit Cost Update
+'																				=	04: Update All Costs From Alt Cost
+'RefreshDescForRawMatl		=	Refresh Descriptions For Raw Materials Flag		=	Y/N
+'RefreshDescForParentParts	=	Refresh Descriptions For Parent Parts Flag		=	Y/N
+'RefreshUM					=	Refresh Unit Of Measure Fields Flag				=	Y/N
+'RefreshSource				=	Refresh Source Code Flag						=	Y/N
+'================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s1010Error.Declare(String)
+F.Data.DataTable.Create("1010",True)
+F.Data.DataTable.AddColumn("1010","Process","String")
+F.Data.DataTable.AddColumn("1010","BegBOMParent","String")
+F.Data.DataTable.AddColumn("1010","BegBOMRev","String")
+F.Data.DataTable.AddColumn("1010","EndBOMParent","String")
+F.Data.DataTable.AddColumn("1010","EndBOMRev","String")
+F.Data.DataTable.AddColumn("1010","AllBOMs","String")
+F.Data.DataTable.AddColumn("1010","UpdateCost","String")
+F.Data.DataTable.AddColumn("1010","RefreshDescForRawMatl","String")
+F.Data.DataTable.AddColumn("1010","RefreshDescForParentParts","String")
+F.Data.DataTable.AddColumn("1010","RefreshUM","String")
+F.Data.DataTable.AddColumn("1010","RefreshSource","String")
+Program.Sub.Preflight.End
+
+Program.Sub.1010.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	
+	'For each row in the datatable we take the filled out parameters, combine them appropriately, then call the call wrapper according to the method called by the programmer.
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.1010.RowCount--,1)
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.1010(V.Local.iCount).Process!FieldVal,V.DataTable.1010(V.Local.iCount).BegBOMParent!FieldVal,V.DataTable.1010(V.Local.iCount).BegBOMRev!FieldVal,V.DataTable.1010(V.Local.iCount).EndBOMParent!FieldVal,V.DataTable.1010(V.Local.iCount).EndBOMRev!FieldVal,V.DataTable.1010(V.Local.iCount).AllBOMs!FieldVal,V.DataTable.1010(V.Local.iCount).UpdateCost!FieldVal,V.DataTable.1010(V.Local.iCount).RefreshDescForRawMatl!FieldVal,V.DataTable.1010(V.Local.iCount).RefreshDescForParentParts!FieldVal,V.DataTable.1010(V.Local.iCount).RefreshUM!FieldVal,V.DataTable.1010(V.Local.iCount).RefreshSource!FieldVal,V.Local.sParams)
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(1010,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(1010,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("1010")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.1010.End
+
+'Calls 1010 with callwrapper type of 0
+Program.Sub.1010Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(1010,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.1010Sync.End
+
+'Calls 1010 with callwrapper type of 1
+Program.Sub.1010Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(1010,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1010,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.1010Async.End
+
+Program.Sub.CatchError1010.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s1010Error)
+Program.Sub.CatchError1010.End

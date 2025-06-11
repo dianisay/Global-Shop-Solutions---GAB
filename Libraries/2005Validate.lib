@@ -1,0 +1,38 @@
+'The datatable is structed as follows:
+'Column	=	Parameter	=	Possible Values
+'================================================================================================================
+'Job	=	Job			=	######
+'Suffix	=	Suffix		=	###
+'Seq	=	Sequence	=	######
+'================================================================================================================
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.2005Validate.Start
+F.Intrinsic.Control.Try
+	'Check to see if this was called by Manual Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,!=,"M")
+		'Add test data
+		F.Data.DataTable.AddRow("2005","Job","500005","Suffix","000","Seq","001000")
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O")
+		F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+	F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed.Not)
+		F.Intrinsic.Control.CallSub(2005Sync)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2005Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2005Validate.End
+
+Program.Sub.CatchError2005Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 2005Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError2005Validate.End

@@ -1,0 +1,44 @@
+'The datatable is structed as follows:
+'Column		=	Parameter				=	Possible Values
+'================================================================================================================
+'CompCode	=	Company Code			=	CCC - defaults to currently logged in user's company code
+'Type		=	Type					=	"W" - Workorders
+'										=	"S" - Single Job
+'BegWO		=	Beginning Work Order	=	######
+'BegSuf		=	Beginning Suffix		=	###
+'EndWO		=	Ending Work Order		=	######
+'EndSuf		=	Ending Suffix			=	###
+'Term		=	Terminal				=	TTT - defaults to currently logged in user's terminal number
+'================================================================================================================
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.2002Validate.Start
+F.Intrinsic.Control.Try
+	
+    'Check to see if this was called by Manual Menu Item
+    F.Intrinsic.Control.If(V.Caller.Switches,!=,"M")
+		'Add test data
+		F.Data.DataTable.AddRow("2002","Type","W","BegWO","500039","BegSuf","000","EndWO","500039","EndSuf","000")
+	F.Intrinsic.Control.EndIf
+	
+    'Check to see if this was called by Override Menu Item
+    F.Intrinsic.Control.If(V.Caller.Switches,=,"O")
+        F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+    F.Intrinsic.Control.EndIf
+    	
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed.Not)
+		F.Intrinsic.Control.CallSub(2002Sync)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2002Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.2002Validate.End
+
+Program.Sub.CatchError2002Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 2002Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError2002Validate.End

@@ -1,0 +1,86 @@
+'This library helps with the use of the 2000 Call wrapper, 
+
+'"This program is passed the job, suffix, sequence and total scrap quantity, as well as an array with existing scrap reason codes and assigned quantities. 
+'It will display these in the repat group if the array is not empty, and/or simply allow the add/update/delete of the desired reason codes and quazntity combinations." (JB0082).
+
+'To use it, simply fill out the 2000 datatable with the data for a single call to the call wrapper for each row.
+'Then call either 2000Sync or 2000Async to have the call wrapper run on each row.
+Program.Sub.Preflight.Start
+V.Global.s2000Error.Declare(String)
+F.Data.DataTable.Create("2000",True)
+F.Data.DataTable.AddColumn("2000","Mode","String")
+F.Data.DataTable.AddColumn("2000","Job","String")
+F.Data.DataTable.AddColumn("2000","Suffix","String")
+F.Data.DataTable.AddColumn("2000","Sequence","String")
+F.Data.DataTable.AddColumn("2000","TotalScrap","String")
+F.Data.DataTable.AddColumn("2000","ScrapReference","String")
+F.Data.DataTable.AddColumn("2000","SCRDTDate","String")
+F.Data.DataTable.AddColumn("2000","SCRDTTime","String")
+F.Data.DataTable.AddColumn("2000","SCRDTSeq","String")
+F.Data.DataTable.AddColumn("2000","SCRDTDTLJob","String")
+F.Data.DataTable.AddColumn("2000","SCRDTDTLSuffix","String")
+F.Data.DataTable.AddColumn("2000","SCRDTDTLSeq","String")
+F.Data.DataTable.AddColumn("2000","SCRDTDTLDate","String")
+F.Data.DataTable.AddColumn("2000","SCRDTDTLKeySeq","String")
+F.Data.DataTable.AddColumn("2000","SCRDTStat","String")
+F.Data.DataTable.AddColumn("2000","SCRDTQuality","String")
+F.Data.DataTable.AddColumn("2000","SCRDTReasonCode","String")
+F.Data.DataTable.AddColumn("2000","SCRDTQty","String")
+F.Data.DataTable.AddColumn("2000","SCRDTScrapRef","String")
+F.Data.DataTable.AddColumn("2000","StatusOnSave","String")
+F.Data.DataTable.AddColumn("2000","DestDtlKey","String")
+F.Data.DataTable.AddColumn("2000","DestScrapRef","String")
+F.Data.DataTable.AddColumn("2000","GetQualityFlag","String")
+F.Data.DataTable.AddColumn("2000","UpdateQualityFlag","String")
+F.Data.DataTable.AddColumn("2000","Status","String")
+F.Data.DataTable.AddColumn("2000","RetPrimaryReason","String")
+F.Data.DataTable.AddColumn("2000","RetPrimaryQty","String")
+F.Data.DataTable.AddColumn("2000","RetPrimaryQuality","String")
+Program.Sub.Preflight.End
+
+Program.Sub.2000.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	
+	'For each row in the datatable: concat needed parameters then call the callwrapper according to how the programmer called
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.2000.RowCount--,1)
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.2000(V.Local.iCount).Mode!FieldVal,V.DataTable.2000(V.Local.iCount).Job!FieldVal,V.DataTable.2000(V.Local.iCount).Suffix!FieldVal,V.DataTable.2000(V.Local.iCount).Sequence!FieldVal,V.DataTable.2000(V.Local.iCount).TotalScrap!FieldVal,V.DataTable.2000(V.Local.iCount).ScrapReference!FieldVal,V.DataTable.2000(V.Local.iCount).ScrapReference!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTDate!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTTime!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTSeq!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTDTLJob!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTDTLSuffix!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTDTLSeq!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTDTLDate!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTDTLKeySeq!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTStat!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTQuality!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTReasonCode!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTQty!FieldVal,V.DataTable.2000(V.Local.iCount).SCRDTScrapRef!FieldVal,V.DataTable.2000(V.Local.iCount).StatusOnSave!FieldVal,V.DataTable.2000(V.Local.iCount).DestDtlKey!FieldVal,V.DataTable.2000(V.Local.iCount).DestScrapRef!FieldVal,V.DataTable.2000(V.Local.iCount).GetQualityFlag!FieldVal,V.DataTable.2000(V.Local.iCount).UpdateQualityFlag!FieldVal,V.DataTable.2000(V.Local.iCount).Status!FieldVal,V.DataTable.2000(V.Local.iCount).RetPrimaryReason!FieldVal,V.DataTable.2000(V.Local.iCount).RetPrimaryQty!FieldVal,V.DataTable.2000(V.Local.iCount).RetPrimaryQuality!FieldVal,V.Local.sParams)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(2000,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(2000,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("2000")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2000,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.2000.End
+
+'Calls 2000 with callwrapper type of 0
+Program.Sub.2000Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2000,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2000, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2000Sync.End
+
+'Calls 2000 with callwrapper type of 1
+Program.Sub.2000Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2000,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2000, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2000Async.End
+
+Program.Sub.CatchError2000.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s2000Error)
+Program.Sub.CatchError2000.End

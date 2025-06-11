@@ -1,0 +1,64 @@
+''This library helps with the use of the 2005 Call wrapper, Commit Router Material (Program JB0056GI). To use it, simply fill out the 2005 datatable with the data for a single call to the call wrapper for each row.
+'Then call either 2005Sync or 2005Async to have the call wrapper run on each row.
+'The datatable is structed as follows:
+'Column	=	Parameter	=	Possible Values
+'================================================================================================================
+'Job	=	Job			=	######
+'Suffix	=	Suffix		=	###
+'Seq	=	Sequence	=	######
+'================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s2005Error.Declare(String)
+F.Data.DataTable.Create("2005",True)
+F.Data.DataTable.AddColumn("2005","Job","String")
+F.Data.DataTable.AddColumn("2005","Suffix","String")
+F.Data.DataTable.AddColumn("2005","Seq","String")
+Program.Sub.Preflight.End
+
+Program.Sub.2005.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	
+	'For each row in datatable: concat parameters, then pass parameters to callwrapper according to how the programmer declared.
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.2005.RowCount--,1)
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.2005(V.Local.iCount).Job!FieldVal,V.DataTable.2005(V.Local.iCount).Suffix!FieldVal,V.DataTable.2005(V.Local.iCount).Seq!FieldVal,V.Local.sParams)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(2005,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(2005,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+		
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("2005")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2005,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.2005.End
+
+'Calls 2005 with callwrapper type of 0
+Program.Sub.2005Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2005,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2005,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2005Sync.End
+
+'Calls 2005 with callwrapper type of 1
+Program.Sub.2005Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2005,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2005,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2005Async.End
+
+Program.Sub.CatchError2005.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s2005Error)
+Program.Sub.CatchError2005.End

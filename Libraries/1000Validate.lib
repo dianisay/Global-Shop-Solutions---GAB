@@ -1,0 +1,36 @@
+'The datatable is structed as follows:
+'Column		=	Parameter		=	Possible Values
+'================================================================================================================
+'CompCode	=	Company Code	=	CCC - defaults to currently logged in user's company code
+'================================================================================================================
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.1000Validate.Start
+F.Intrinsic.Control.Try
+	
+	'Add test data
+	F.Intrinsic.Control.If(V.Caller.Switches,<>,"M")
+		F.Data.DataTable.AddRow("1000")
+	F.Intrinsic.Control.EndIf
+	
+	'Check to see if this was called by Override Menu Item
+	F.Intrinsic.Control.If(V.Caller.Switches,=,"O")
+		F.Intrinsic.Control.CallSub(LoadManualDataEntry)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.Global.bManualEntryClosed.Not)
+		F.Intrinsic.Control.CallSub(1000Sync)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError1000Validate, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.1000Validate.End
+
+Program.Sub.CatchError1000Validate.Start
+V.Local.sError.Declare(String)
+F.Intrinsic.String.Build("Call Wrapper 1000Validate{0}{0} Subroutine: {1}{0}Error {2} occured with description: {3}", V.Ambient.NewLine, V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.End
+Program.Sub.CatchError1000Validate.End

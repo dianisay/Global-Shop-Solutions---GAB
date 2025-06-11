@@ -1,0 +1,181 @@
+'This library helps with the use of the 2004 Call wrapper, WIP to FG (JB0052GI). To use it, simply fill out the 2004 datatable with the data for a single call to the call wrapper for each row.
+'If you need to create a file you can also fill out the 2004File datatable. This datatable links back to the 2004 datatable on Work Order and Work Order Suffix. For each line in the file
+'add a row to the 2004File datatable. The file will be created for you when one of the library functions is called. Once done, call either 2004Sync or 2004Async to have the call wrapper run on each row. 
+'The 2004 datatable is structed as follows:
+'Column					=	Parameter										=	Possible Values
+'=======================================================================================================================
+'CompanyCode			=	Company Code									=	Defaults to V.Caller.CompanyCode
+'Terminal				=	Terminal										=	Defaults to V.Caller.Terminal
+'CallingProgram			=	Calling Program									=	Defaults to V.Caller.Caller
+'Mode					=	Mode											=	"NS" - Screenless Mode
+'																			=	"OS" - Open Screen Mode
+'DtlWO					=	Dtl Work Order (used for action "R")			=	X(6)
+'DtlWOSuffix			=	Dtl Work Order Suffix (used for action "R")		=	X(3)
+'DtlWOSeq				=	Dtl Work Order Sequence (used for action "R")	=	X(6)
+'DtlFill				=	Dtl Fill (used for action "R")					=	X(1)
+'DtlDate				=	Dtl Date (used for action "R")					=	MMDDYY
+'DtlKeySeq				=	Dtl Key Seq (used for action "R")				=	X(4)
+'WO						=	Work Order										=	X(6)
+'WOSuffix				=	Work Order Suffix								=	X(3)
+'XferYear				=	Transfer Year									=	YYYY
+'XferMonth				=	Transfer Month									=	MM
+'XferDay				=	Transfer Day									=	DD
+'CloseWOFlag			=	Close Work Order Flag							=	Y/N
+'PartDesc				=	Part Description								=	X(30)
+'Qty					=	Quantity										=	8.4
+'Cost					=	Cost											=	8.4
+'Price					=	Price											=	8.4
+'PrintLabelsFlag		=	Print Labels Flag								=	Y/N
+'CostMethod				=	Costing Method									=	"E" - Estimate
+'																			=	"P" - Percentage
+'																			=	"I" - Inventory
+'																			=	"L" - Alternate
+'																			=	"A" - Actual
+'																			=	"R" - Remaining
+'																			=	"U" - Manual
+'UpdateInventoryFlag	=	Update Inventor Flag							=	Y/N
+'InventoryDebitAccount	=	Inventory Debit Account							=	X(15)
+'FileName				=	File Name										=	Defaults to \Global\Files\cccttt2004.txt
+'Action					=	Action											=	" " - Normal
+'																			=	"R" - Reverse
+'																			=	"A" - Auto Reverse
+'=======================================================================================================================
+'
+'The 2004File datatable is structed as follows:
+'Column		=	Parameter			=	Possible Values
+'=======================================================================================================================
+'WO			=	Work Order			=	X(6) - Lines up with work order number for related call in 2004 datatable
+'WOSuffix	=	Work Order Suffix	=	X(3) - Lines up with work order suffix for related call in 2004 datatable
+'Lot		=	Lot Number			=	X(15)
+'Bin		=	Bin Number			=	X(6)
+'Heat		=	Heat Number			=	X(15)
+'Serial		=	Serial Number		=	X(30)
+'Qty		=	Quantity			=	8.4
+'ExpDate	=	Expiration Date		=	YYYYMMDD
+'Warranty	=	Warranty Months		=	9(3)
+'UserField1	=	User Field 1		=	X(15)
+'UserField2	=	User Field 2		=	X(15)
+'UserField3	=	User Field 3		=	X(15)
+'UserField4	=	User Field 4		=	X(15)
+'UserField5	=	User Field 5		=	X(15)
+'UserField6	=	User Field 6		=	X(15)
+'UserField7	=	User Field 7		=	X(15)
+'UserField8	=	User Field 8		=	X(15)
+'UserField9	=	User Field 9		=	X(15)
+'=======================================================================================================================
+Program.Sub.Preflight.Start
+V.Global.s2004Error.Declare(String)
+V.Global.s2004FileName.Declare(String)
+V.Global.s2004FilePath.Declare(String)
+
+F.Intrinsic.String.Build("{0}{1}2004.txt",V.Caller.CompanyCode,V.Caller.Terminal,V.Global.s2004FileName)
+F.Intrinsic.String.Build("{0}\{1}",V.Caller.FilesDir,V.Global.s2004FileName,V.Global.s2004FilePath)
+
+F.Data.DataTable.Create("2004",True)
+F.Data.DataTable.AddColumn("2004","CompanyCode","String",V.Caller.CompanyCode)
+F.Data.DataTable.AddColumn("2004","Terminal","String",V.Caller.Terminal)
+F.Data.DataTable.AddColumn("2004","CallingProgram","String",V.Caller.Caller)
+F.Data.DataTable.AddColumn("2004","Mode","String")
+F.Data.DataTable.AddColumn("2004","DtlWO","String")
+F.Data.DataTable.AddColumn("2004","DtlWOSuffix","String")
+F.Data.DataTable.AddColumn("2004","DtlWOSeq","String")
+F.Data.DataTable.AddColumn("2004","DtlFill","String")
+F.Data.DataTable.AddColumn("2004","DtlDate","String")
+F.Data.DataTable.AddColumn("2004","DtlKeySeq","String")
+F.Data.DataTable.AddColumn("2004","WO","String")
+F.Data.DataTable.AddColumn("2004","WOSuffix","String")
+F.Data.DataTable.AddColumn("2004","XferYear","String")
+F.Data.DataTable.AddColumn("2004","XferMonth","String")
+F.Data.DataTable.AddColumn("2004","XferDay","String")
+F.Data.DataTable.AddColumn("2004","CloseWOFlag","String")
+F.Data.DataTable.AddColumn("2004","PartDesc","String")
+F.Data.DataTable.AddColumn("2004","Qty","String")
+F.Data.DataTable.AddColumn("2004","Cost","String")
+F.Data.DataTable.AddColumn("2004","Price","String")
+F.Data.DataTable.AddColumn("2004","PrintLabelsFlag","String")
+F.Data.DataTable.AddColumn("2004","CostMethod","String")
+F.Data.DataTable.AddColumn("2004","UpdateInventoryFlag","String")
+F.Data.DataTable.AddColumn("2004","InventoryDebitAccount","String")
+F.Data.DataTable.AddColumn("2004","FileName","String",V.Global.s2004FilePath)
+F.Data.DataTable.AddColumn("2004","Action","String")
+
+F.Data.DataTable.Create("2004File",True)
+F.Data.DataTable.AddColumn("2004File","WO","String")
+F.Data.DataTable.AddColumn("2004File","WOSuffix","String")
+F.Data.DataTable.AddColumn("2004File","Lot","String")
+F.Data.DataTable.AddColumn("2004File","Bin","String")
+F.Data.DataTable.AddColumn("2004File","Heat","String")
+F.Data.DataTable.AddColumn("2004File","Serial","String")
+F.Data.DataTable.AddColumn("2004File","Qty","String")
+F.Data.DataTable.AddColumn("2004File","ExpDate","String")
+F.Data.DataTable.AddColumn("2004File","Warranty","String")
+F.Data.DataTable.AddColumn("2004File","UserField1","String")
+F.Data.DataTable.AddColumn("2004File","UserField2","String")
+F.Data.DataTable.AddColumn("2004File","UserField3","String")
+F.Data.DataTable.AddColumn("2004File","UserField4","String")
+F.Data.DataTable.AddColumn("2004File","UserField5","String")
+F.Data.DataTable.AddColumn("2004File","UserField6","String")
+F.Data.DataTable.AddColumn("2004File","UserField7","String")
+F.Data.DataTable.AddColumn("2004File","UserField8","String")
+F.Data.DataTable.AddColumn("2004File","UserField9","String")
+Program.Sub.Preflight.End
+
+Program.Sub.2004.Start
+F.Intrinsic.Control.Try
+	V.Local.sParams.Declare(String)
+	V.Local.iCount.Declare(Long,-1)
+	V.Local.sFilter.Declare(String)
+	V.Local.sFileContent.Declare(String)
+	'For each row in the datatable: build file, concat needed parameters then call the callwrapper according to how the programmer called
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.2004.RowCount--,1)
+	
+		F.Intrinsic.String.Build("WO = '{0}' AND WOSuffix = '{1}'",V.DataTable.2004(V.Local.iCount).WO!FieldVal,V.DataTable.2004(V.Local.iCount).WOSuffix!FieldVal,V.Local.sFilter)
+		F.Data.DataView.Create("2004File","2004FileView",22,V.Local.sFilter,"")
+		
+		F.Intrinsic.Control.If(V.DataView.2004File!2004FileView.RowCount,>,0)
+			F.Data.DataView.ToString("2004File","2004FileView","Lot*!*Bin*!*Heat*!*Serial*!*Qty*!*ExpDate*!*Warranty*!*UserField1*!*UserField2*!*UserField3*!*UserField4*!*UserField5*!*UserField6*!*UserField7*!*UserField8*!*UserField9",V.Ambient.Tab,V.Ambient.NewLine,V.Local.sFileContent)
+			F.Intrinsic.File.String2File(V.Global.s2004FilePath,V.Local.sFileContent)
+		F.Intrinsic.Control.EndIf
+		
+		F.Data.DataView.Close("2004File","2004FileView")
+		
+		F.Intrinsic.String.ConcatCallWrapperArgs(V.DataTable.2004(V.Local.iCount).CompanyCode!FieldVal,V.DataTable.2004(V.Local.iCount).Terminal!FieldVal,V.DataTable.2004(V.Local.iCount).CallingProgram!FieldVal,V.DataTable.2004(V.Local.iCount).Mode!FieldVal,V.DataTable.2004(V.Local.iCount).DtlWO!FieldVal,V.DataTable.2004(V.Local.iCount).DtlWOSuffix!FieldVal,V.DataTable.2004(V.Local.iCount).DtlWOSeq!FieldVal,V.DataTable.2004(V.Local.iCount).DtlFill!FieldVal,V.DataTable.2004(V.Local.iCount).DtlDate!FieldVal,V.DataTable.2004(V.Local.iCount).DtlKeySeq!FieldVal,V.DataTable.2004(V.Local.iCount).WO!FieldVal,V.DataTable.2004(V.Local.iCount).WOSuffix!FieldVal,V.DataTable.2004(V.Local.iCount).XferYear!FieldVal,V.DataTable.2004(V.Local.iCount).XferMonth!FieldVal,V.DataTable.2004(V.Local.iCount).XferDay!FieldVal,V.DataTable.2004(V.Local.iCount).CloseWOFlag!FieldVal,V.DataTable.2004(V.Local.iCount).PartDesc!FieldVal,V.DataTable.2004(V.Local.iCount).Qty!FieldVal,V.DataTable.2004(V.Local.iCount).Cost!FieldVal,V.DataTable.2004(V.Local.iCount).Price!FieldVal,V.DataTable.2004(V.Local.iCount).PrintLabelsFlag!FieldVal,V.DataTable.2004(V.Local.iCount).CostMethod!FieldVal,V.DataTable.2004(V.Local.iCount).UpdateInventoryFlag!FieldVal,V.DataTable.2004(V.Local.iCount).InventoryDebitAccount!FieldVal,V.DataTable.2004(V.Local.iCount).FileName!FieldVal,V.DataTable.2004(V.Local.iCount).Action!FieldVal,V.Local.sParams)
+		
+		F.Intrinsic.Control.SelectCase(V.Args.CallWrapperType)
+			F.Intrinsic.Control.Case(0)
+				F.Global.General.CallWrapperSync(2004,V.Local.sParams)
+			F.Intrinsic.Control.Case(1)
+				F.Global.General.CallWrapperAsync(2004,V.Local.sParams)
+		F.Intrinsic.Control.EndSelect
+		
+	F.Intrinsic.Control.Next(V.Local.iCount)
+	
+	F.Data.DataTable.DeleteRow("2004")
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004,"Sub",V.Ambient.CurrentSubroutine,"ErrNo",V.Ambient.ErrorNumber,"ErrDesc",V.Ambient.ErrorDescription,"Row",V.Local.iCount)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004.End
+
+'Calls 2004 with callwrapper type of 0
+Program.Sub.2004Sync.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2004,"CallWrapperType",0)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004Sync.End
+
+'Calls 2004 with callwrapper type of 1
+Program.Sub.2004Async.Start
+F.Intrinsic.Control.Try
+	F.Intrinsic.Control.CallSub(2004,"CallWrapperType",1)
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(CatchError2004, "Sub", V.Ambient.CurrentSubroutine, "ErrNo", V.Ambient.ErrorNumber, "ErrDesc", V.Ambient.ErrorDescription,"Row",-2)
+F.Intrinsic.Control.EndTry
+Program.Sub.2004Async.End
+
+Program.Sub.CatchError2004.Start
+V.Local.iActualRow.Declare(Long)
+F.Intrinsic.Math.Add(V.Args.Row,1,V.Local.iActualRow)
+F.Intrinsic.String.Build("{0}*!*{1}*!*{2}*!*{3}", V.Args.Sub, V.Args.ErrNo, V.Args.ErrDesc,V.Local.iActualRow, V.Global.s2004Error)
+Program.Sub.CatchError2004.End
