@@ -1,0 +1,15 @@
+Exercise 1:
+Create a Try/Catch Statement for yourself and add it to a GAB snippet.
+
+Exercise 2:
+Modify script to create a datatable from Orders attach that datatable to a gridview and show it to the user.  Add Try/Catch from Exercise 1
+
+Exercise 3:
+Modify the project created in exercise 2 to add a grid format sub and add captions to the column headers as well as make them bold.
+
+Exercise 4:
+Modify the project created in exercise 3 to add a row cell click event to the gridview.  Make the order number blue to reflect a hyperlink.  When the order number is clicked, open the order header screen to that order.
+
+Excercise 5 (from Session 2, GAB 201)
+Write a small script and attach it to the populate hook of the Inventory > View > Inventory Extended Status – NEW screen.
+Rename Script 1 to “GAB 201”

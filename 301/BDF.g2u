@@ -1,0 +1,73 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+V.Local.iRowCount.Declare
+V.Local.iCnt.Declare
+V.Local.sRow.Declare
+
+'F.Intrinsic.BDF.Load("SupplyGrid",V.Passed.GRID-SUPPLY,True)
+'F.Intrinsic.BDF.CLone("SupplyGrid","NewSupplyGrid")
+
+'F.Intrinsic.BDF.ReadRowCount("SupplyGrid",V.Local.iRowCount)
+'F.Intrinsic.Math.Sub(V.Local.iRowCount,1,V.Local.iRowCount)
+
+''BDF is delimited by |~|
+
+'F.Intrinsic.Control.For(V.Local.iCnt,V.Local.iRowCount)
+'	F.Intrinsic.BDF.ReadRow("SupplyGrid",V.Local.iCnt,V.Local.sRow)
+'	'F.Intrinsic.BDF.TextMatrix("SupplyGrid",1,V.Local.iCnt,V.Local.sRow)
+'	
+'	F.Intrinsic.String.Split(V.Local.sRow,"|~|",V.Local.sRow)
+'	
+'	F.Intrinsic.Control.If(V.Local.sRow(1).Trim,=,"PO")
+'		V.Local.sRow(1).Set("PurchOrd")
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Control.If(V.Local.sRow(2).Float,<,1000)
+'		F.Intrinsic.String.Build("{0}]=[BC::{1}",V.Local.sRow(2),V.Color.LtGreen,V.Local.sRow(2))
+'	F.Intrinsic.Control.ElseIf(V.Local.sRow(2).Float,=,1000)
+'		F.Intrinsic.String.Build("{0}]=[BC::{1}",V.Local.sRow(2),V.Color.Yellow,V.Local.sRow(2))
+'	F.Intrinsic.Control.Else
+'		F.Intrinsic.String.Build("{0}]=[BC::{1}",V.Local.sRow(2),V.Color.Pink,V.Local.sRow(2))
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.String.Join(V.Local.sRow,"|~|",V.Local.sRow)
+'	
+'	F.Intrinsic.BDF.WriteRow("NewSupplyGrid",V.Local.sRow)
+'	
+'F.Intrinsic.Control.Next(V.Local.iCnt)
+
+'F.Intrinsic.BDF.Save("NewSupplyGrid",V.Passed.GRID-SUPPLY)
+
+F.Intrinsic.BDF.Load("SnDButtons","SupplyAndDemand-AccordionControlNavigation-bdf",True)
+F.Intrinsic.BDF.Clone("SnDButtons","NewSnDButtons")
+
+F.Intrinsic.BDF.ReadRowCount("SnDButtons",V.Local.iRowCount)
+F.Intrinsic.Math.Sub(V.Local.iRowCount,1,V.Local.iRowCount)
+
+F.Intrinsic.Control.For(V.Local.iCnt,V.Local.iRowCount)
+	F.Intrinsic.BDF.ReadRow("SnDButtons",V.Local.iCnt,V.Local.sRow)
+	
+	F.Intrinsic.String.Split(V.Local.sRow,"|~|",V.Local.sRow)
+	
+	F.Intrinsic.Control.If(V.Local.sRow(0).Trim,=,"AccordionControlElementScript1")	
+		V.Local.sRow(1).Set("Custom GAB Script")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.String.Join(V.Local.sRow,"|~|",V.Local.sRow)
+
+	F.Intrinsic.BDF.WriteRow("NewSnDButtons",V.Local.sRow)
+
+F.Intrinsic.Control.Next(V.Local.iCnt)
+
+F.Intrinsic.BDF.Save("NewSnDButtons","SupplyAndDemand-AccordionControlNavigation-bdf")
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250312103018269$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcAd33WuS+D//N7yrRSx1s3MHml3LpTpZ34=
+${$7$}$File Version:1.1.20250312153018.0
+Program.Sub.Comments.End

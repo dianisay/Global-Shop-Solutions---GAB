@@ -1,0 +1,53 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+V.Local.bCheck.Declare
+V.Local.sSender.Declare
+V.Local.sRecipients.Declare
+V.Local.sAttachments.Declare
+V.Local.iCnt.Declare
+V.Local.sRet.Declare
+V.Local.sSubject.Declare
+V.Local.sBody.Declare
+V.Local.iUser.Declare
+
+'Outlook
+F.Automation.MSOutlook.CheckPresence(V.Local.bCheck)
+
+F.Intrinsic.Control.If(V.Local.bCheck.Not)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndIf
+
+'F.Automation.MSOutlook.ComposeEmail("tsmith@gssmail.com;test@test.com","This is the subject","This is the body","E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx")
+''F.Automation.MSOutlook.QueueEmail() ' - Automatically sends email
+
+'Courier
+F.Global.Security.GetUserEmail(V.Caller.User,V.Local.sSender)
+F.Global.Security.GetUserId(V.Caller.User,V.Caller.CompanyCode,V.Local.iUser)
+
+V.Local.sRecipients.Set("Travis Smith*!*tsmith@gssmail.com")
+V.Local.sAttachments.Set("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx")
+
+F.Intrinsic.Control.For(V.Local.iCnt,V.Local.sAttachments.UBound)
+	F.Intrinsic.String.Split(V.Local.sAttachments(V.Local.iCnt),"\",V.Local.sRet)
+	V.Local.sAttachments(V.Local.iCnt).Set(V.Local.sRet(V.Local.sRet.UBound))
+	V.Local.sRet(V.Local.sRet.UBound).Set("")
+	F.Intrinsic.String.Join(V.Local.sRet,"\",V.Local.sRet)
+	V.Local.sRet.RedimPreserve(0,0)
+	F.Intrinsic.String.Build("{0}*!*{1}",V.Local.sAttachments(V.Local.iCnt),V.Local.sRet,V.Local.sAttachments(V.Local.iCnt))
+F.Intrinsic.Control.Next(V.Local.iCnt)
+
+V.Local.sSubject.Set("This is the subject")
+V.Local.sBody.Set("This is the body")
+
+F.Global.Messaging.QueueMessage(V.Caller.CompanyCode,V.Local.iUser,"GAB 301",V.Local.sSubject,V.Local.sSender,V.Local.sRecipients,V.Local.sBody,5,"",False,"","","","","","","",V.Local.sAttachments,False,"")
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250312140134393$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcChCjNKBkvS7nB9YLaJwgWsDIZdHWYgvHg=
+${$7$}$File Version:1.1.20250312190134.0
+Program.Sub.Comments.End

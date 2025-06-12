@@ -1,0 +1,95 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+V.Local.bCheck.Declare
+V.Local.sSQL.Declare
+V.Local.sCols.Declare
+V.Local.sExcelSave.Declare
+V.Local.iRowCount.Declare
+
+F.Automation.MSExcel.CheckPresence(V.Local.bCheck)
+
+F.Intrinsic.Control.If(V.Local.bCheck.Not)
+	F.Automation.OOGeneral.CheckPresence(V.Local.bCheck)
+	F.Intrinsic.Control.If(V.Local.bCheck.Not)
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+'F.Automation.MSExcel.ReadSpreadsheet("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",V.Local.sSQL) ' Sheet delimiter &^&
+''F.Automation.OOCalc.ReadSpreadsheet("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",True,5,15,V.Local.sSQL)
+
+'F.Intrinsic.String.Split(V.Local.sSQL,"$!$",V.Local.sSQL)
+'V.Local.sCols.Set(V.Local.sSQL(0))
+
+'F.Intrinsic.Variable.RemoveArrayElementByOrdinal(V.Local.sSQL,0,V.Local.sSQL)
+'F.Intrinsic.String.Join(V.Local.sSQL,"$!$",V.Local.sSQL)
+
+'V.Local.sSQL.RedimPreserve(0,0)
+
+'F.Data.DataTable.CreateFromString("dtExcel",V.Local.sSQL,V.Local.sCols,"String*!*String*!*String*!*String*!*String","*!*","$!$",True)
+'F.Data.DataTable.AddRow("dtExcel","Column1","Value46","Column2","Value47","Column3","Value48","Column4","Value49","Column5","Value50")
+
+'F.Data.DataView.Create("dtExcel","dvSave",22)
+
+'F.Data.DataView.ToString("dtExcel","dvSave",V.DataTable.dtExcel.FieldNames,"*!*","$!$",V.Local.sExcelSave)
+
+'F.Intrinsic.String.Build("{0}$!${1}",V.DataTable.dtExcel.FieldNames,V.Local.sExcelSave,V.Local.sExcelSave)
+
+'F.Intrinsic.File.IsFileLocked("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",V.Local.bCheck)
+
+'F.Intrinsic.Control.If(V.Local.bCheck)
+'	F.Intrinsic.UI.Msgbox("Please close the Excel file","Error - File In Use")
+'	F.Intrinsic.Control.End
+'F.Intrinsic.Control.EndIf
+
+'F.Automation.MSExcel.WriteSpreadsheet("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",V.Local.sExcelSave)
+
+'F.Data.DataView.Close("dtExcel","dvSave")
+'F.Data.DataTable.Close("dtExcel")
+
+F.Automation.MSExcel.CreateAppObject("oExcel")
+F.Automation.MSExcel.OpenWorkbook("oExcel","oBook","E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx")
+F.Automation.MSExcel.OpenWorksheet("oBook","oSheet",1)
+
+F.Automation.MSExcel.RowCount("oSheet",V.Local.iRowCount)
+F.Automation.MSExcel.WriteCell("oSheet",1,6,"ColumnNew6")
+
+F.Automation.MSExcel.SaveWorkbook("oBook")
+
+F.Automation.MSExcel.DestroyAllObjects("oExcel","oBook","oSheet")
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Automation.MSExcel.DestroyAllObjects("oExcel","oBook","oSheet")
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.Finally
+	F.Automation.MSExcel.DestroyAllObjects("oExcel","oBook","oSheet")
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Ambient.SubroutineCalledFrom, V.Ambient.ErrorNumber, V.Ambient.ErrorDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Ambient.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250312134856246$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcBFz/qj326DSViMhXv2gQkNSg764FUScZE=
+${$7$}$File Version:1.1.20250312184856.0
+Program.Sub.Comments.End

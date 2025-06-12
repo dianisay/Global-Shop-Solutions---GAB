@@ -1,0 +1,394 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.F_Main..Create(BaseForm)
+Gui.F_Main..Caption("GAB 301")
+Gui.F_Main..Size(1631,863)
+Gui.F_Main..MinX(0)
+Gui.F_Main..MinY(0)
+Gui.F_Main..Position(0,0)
+Gui.F_Main..AlwaysOnTop(False)
+Gui.F_Main..FontName("Tahoma")
+Gui.F_Main..FontSize(8.25)
+Gui.F_Main..ControlBox(True)
+Gui.F_Main..MaxButton(True)
+Gui.F_Main..MinButton(True)
+Gui.F_Main..MousePointer(0)
+Gui.F_Main..Moveable(True)
+Gui.F_Main..Sizeable(True)
+Gui.F_Main..ShowInTaskBar(True)
+Gui.F_Main..TitleBar(True)
+Gui.F_Main..Event(UnLoad,F_Main_UnLoad)
+Gui.F_Main.GsGcMain.Create(GsGridControl)
+Gui.F_Main.GsGcMain.Enabled(True)
+Gui.F_Main.GsGcMain.Visible(True)
+Gui.F_Main.GsGcMain.Zorder(0)
+Gui.F_Main.GsGcMain.Size(1631,833)
+Gui.F_Main.GsGcMain.Position(0,0)
+Gui.F_Main.GsGcMain.Dock(5)
+Gui.F_Main.GsGcMain.Event(CellValueChanged,GsGcMain_CellValueChanged)
+Gui.F_Main.GsGcMain.Event(RowCellClick,GsGcMain_RowCellClick)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.External.Include.Library("200000.lib")
+Program.External.Include.Library("300011.lib")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(SetUpContextMenus)
+F.Intrinsic.Control.CallSub(LoadData)
+F.Intrinsic.Control.CallSub(FormatGrid)
+F.Intrinsic.Control.CallSub(Deserialize)
+
+Gui.F_Main..Show
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.SetUpContextMenus.Start
+F.Intrinsic.Control.Try
+
+Gui.F_Main..ContextMenuCreate("ctxDash")
+Gui.F_Main..ContextMenuAddItem("ctxDash","cmdRefresh",V.Enum.MenuItemType!Button,"Refresh")
+Gui.F_Main..ContextMenuAddItem("ctxDash","cmdExport",V.Enum.MenuItemType!Button,"Export")
+
+Gui.F_Main..ContextMenuSetItemEventHandler("ctxDash","cmdRefresh","cmdRefresh_Click")
+Gui.F_Main..ContextMenuSetItemEventHandler("ctxDash","cmdExport","cmdExport_Click")
+
+Gui.F_Main.GsGcMain.ContextMenuAttach("ctxDash")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.SetUpContextMenus.End
+
+Program.Sub.LoadData.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(ODBC_OPEN)
+	F.Data.DataTable.CreateFromSQL("dtOrderLines","conts","Select ORDER_NO,Left(RECORD_NO,3) as ORDER_LINE,CUSTOMER,'' as NAME_CUSTOMER,PART,LOCATION,DESCRIPTION,QTY_ORDERED,QTY_SHIPPED,QTY_BO,UM_ORDER as UM, PRICE,COST,DATE_SHIP from V_ORDER_LINES",True)
+	F.Data.DataTable.CreateFromSQL("dtParts","conts","select PART, LOCATION, PRODUCT_LINE, QTY_ONHAND from V_INVENTORY_ALL",True)
+	F.Data.DataTable.CreateFromSQL("dtNotes","conts","select ORDER_NO, ORDER_LINE, NOTES from GCG_DASHBOARD_NOTES",True)
+	
+	F.Data.Dictionary.CreateFromSQL("dictCustName","conts","Select ORDER_NO,RTRIM(NAME_CUSTOMER) from V_ORDER_BILL_TO")	
+F.Intrinsic.Control.CallSub(ODBC_CLOSE)
+
+F.Data.Dictionary.SetDefaultReturn("dictCustName","")
+F.Data.DataTable.FillFromDictionary("dtOrderLines","dictCustName","ORDER_NO","NAME_CUSTOMER")
+F.Data.Dictionary.Close("dictCustName")
+
+F.Data.Linq.Join(V.Enum.LinqJoinType!LeftJoin,V.Enum.LinqSourceType!DataTable,"dtOrderLines*!*LINES",V.Enum.LinqSourceType!DataTable,"dtParts*!*PARTS","LINES.PART = PARTS.PART and LINES.LOCATION = PARTS.LOCATION",V.Enum.LinqSourceType!DataTable,"dtNotes*!*NOTES","LINES.ORDER_NO = NOTES.ORDER_NO and LINES.ORDER_LINE = NOTES.ORDER_LINE","*","","","","dtOrders",True)
+
+F.Data.DataTable.Close("dtOrderLines")
+F.Data.DataTable.Close("dtParts")
+F.Data.DataTable.Close("dtNotes")
+
+F.Data.DataTable.RemoveColumn("dtOrders","PART1")
+F.Data.DataTable.RemoveColumn("dtOrders","LOCATION1")
+F.Data.DataTable.RemoveColumn("dtOrders","ORDER_NO1")
+F.Data.DataTable.RemoveColumn("dtOrders","ORDER_LINE1")
+
+F.Data.DataView.Create("dtOrders","dvOrders",22)
+F.Data.DataView.SetFilter("dtOrders","dvOrders","isnull([DATE_SHIP], #1/1/1900#) = #1/1/1900#")
+F.Data.DataView.SetValue("dtOrders","dvOrders",-1,"DATE_SHIP",V.Ambient.DBNull)
+F.Data.DataView.SetFilter("dtOrders","dvOrders","ORDER_LINE <> '800'")
+F.Data.DataView.SetSort("dtOrders","dvOrders","ORDER_NO asc, ORDER_LINE asc")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadData.End
+
+Program.Sub.FormatGrid.Start
+F.Intrinsic.Control.Try
+V.Local.iCnt.Declare
+V.Local.iDateShip.Declare
+
+Gui.F_Main.GsGcMain.AddGridviewFromDataview("gvOrders","dtOrders","dvOrders")
+Gui.F_Main.GsGcMain.MainView("gvOrders")
+
+Gui.F_Main.GsGcMain.SuspendLayout
+
+Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!ColumnAutoWidth,False)
+Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!ColumnPanelRowHeight,60)
+'Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!Editable,False)
+'Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!ReadOnly,True)
+Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!EnableAppearanceEvenRow,True)
+'Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!MultiselectMode,2)
+'Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!FindAlwaysVisible,True)
+'Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!ShowGroupPanel,True)
+'Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!ShowAutoFilterRow,True)
+Gui.F_Main.GsGcMain.SetGridviewProperty("gvOrders",V.Enum.GridViewPropertyNames!ShowFilterPanelMode,"Default")
+
+'Old column formatting method
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!HeaderFontBold,True)
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_LINE",V.Enum.ColumnPropertyNames!HeaderFontBold,True)
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!HeaderHAlignment,"Far")
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!HeaderVAlignment,"Bottom")
+''Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!Visible,False)
+''Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!AllowShowHide,False)
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!Fixed,Left)
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_LINE",V.Enum.ColumnPropertyNames!Fixed,Left)
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","CUSTOMER",V.Enum.ColumnPropertyNames!AllowMove,False)
+
+'New formatting method - Bulk Formatting
+'Header Font Bold
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols",V.DataTable.dtOrders.FieldNames,"Vals","True","Prop",V.Enum.ColumnPropertyNames!HeaderFontBold)
+'Captions
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols",V.DataTable.dtOrders.FieldNames,"Vals","Sales Order*!*Line*!*Cust*!*Customer*!*Part*!*Loc*!*Desc*!*Order Qty*!*Shipped Qty*!*BO Qty*!*UM*!*Unit Price*!*Unit Cost*!*Date Last Ship*!*PL*!*On Hand*!*Notes","Prop",V.Enum.ColumnPropertyNames!Caption)
+'Allow Edit - All columns
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols",V.DataTable.dtOrders.FieldNames,"Vals","False","Prop",V.Enum.ColumnPropertyNames!AllowEdit)
+'Allow Edit - notes column
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","NOTES","Vals","True","Prop",V.Enum.ColumnPropertyNames!AllowEdit)
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","NOTES","Vals","False","Prop",V.Enum.ColumnPropertyNames!ReadOnly)
+'Column widths
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols",V.DataTable.dtOrders.FieldNames,"Vals","105*!*59*!*66*!*149*!*127*!*56*!*174*!*108*!*106*!*78*!*54*!*92*!*89*!*125*!*50*!*111*!*300","Prop",V.Enum.ColumnPropertyNames!Width)
+'Is hyperlink?
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","ORDER_NO*!*PART","Vals","True","Prop",V.Enum.ColumnPropertyNames!IsHyperlink)
+'Set custom datetime format
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","DATE_SHIP","Vals","d","Prop",V.Enum.ColumnPropertyNames!DisplayCustomDateTime)
+'Custom numeric - quantities
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","QTY_ORDERED*!*QTY_SHIPPED*!*QTY_BO*!*QTY_ONHAND","Vals","#,##0","Prop",V.Enum.ColumnPropertyNames!DisplayCustomNumeric)
+'Custom numeric - dollar values
+F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","PRICE*!*COST","Vals","$ #,##0.00","Prop",V.Enum.ColumnPropertyNames!DisplayCustomNumeric)
+'Visible Index
+'F.Intrinsic.Control.CallSub(BulkFormatting,"Form","F_Main","GV","gvOrders","GSGC","GsGcMain","Cols","DESCRIPTION*!*ORDER_NO*!*ORDER_LINE*!*CUSTOMER*!*NAME_CUSTOMER*!*PART*!*LOCATION*!*QTY_ORDERED*!*QTY_SHIPPED*!*QTY_BO*!*UM*!*PRICE*!*COST*!*DATE_SHIP","Vals","","Prop",V.Enum.ColumnPropertyNames!VisibleIndex)
+
+'Group index
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","CUSTOMER",V.Enum.ColumnPropertyNames!GroupIndex,0)
+'Gui.F_Main.GsGcMain.SetColumnProperty("gvOrders","ORDER_NO",V.Enum.ColumnPropertyNames!GroupIndex,1)
+
+'Group Summary
+'Gui.F_Main.GsGcMain.AddGridGroupSummaryItem("gvOrders","QTY_BO","BO_SUM","Sum","- BO Qty Tot: ","","#,##0")
+
+'conditional formatting - Cannot do in bulk
+Gui.F_Main.GsGcMain.AddStyleFormatCondition("gvOrders","DATE_SHIP","PartialShip","Expression","isnull([DATE_SHIP], #1/1/1900#) <> #1/1/1900# and [QTY_BO] <> 0")
+Gui.F_Main.GsGcMain.SetStyleFormatConditionProperty("gvOrders","DATE_SHIP","PartialShip",V.Enum.ConditionalPropertyNames!BackColor,V.Enum.ThemeColors!ColorYellow.Highlight)
+Gui.F_Main.GsGcMain.SetStyleFormatConditionProperty("gvOrders","DATE_SHIP","PartialShip",V.Enum.ConditionalPropertyNames!ApplyToRow,True)
+
+Gui.F_Main.GsGcMain.AddStyleFormatCondition("gvOrders","DATE_SHIP","FullShip","Expression","isnull([DATE_SHIP], #1/1/1900#) <> #1/1/1900# and [QTY_BO] = 0")
+Gui.F_Main.GsGcMain.SetStyleFormatConditionProperty("gvOrders","DATE_SHIP","FullShip",V.Enum.ConditionalPropertyNames!BackColor,V.Enum.ThemeColors!ColorGreen.Highlight)
+Gui.F_Main.GsGcMain.SetStyleFormatConditionProperty("gvOrders","DATE_SHIP","FullShip",V.Enum.ConditionalPropertyNames!ApplyToRow,True)
+
+'Loop through to set appearance if property not available in the SetStyleFormatConditionProperty
+Gui.F_Main.GsGcMain.GetColumnIndexByName("gvOrders","DATE_SHIP",V.Local.iDateShip)
+
+F.Intrinsic.Control.For(V.Local.iCnt,V.DataTable.dtOrders.RowCount--)
+	F.Intrinsic.Control.If(V.DataTable.dtOrders(V.Local.iCnt).DATE_SHIP!FieldVal,=,V.Ambient.DBNull)
+		Gui.F_Main.GsGcMain.SetCellAppearance("gvOrders",V.Local.iDateShip,V.Local.iCnt,"Icon","DCS-ON")
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.iCnt)
+
+Gui.F_Main.GsGcMain.ResumeLayout
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.FormatGrid.End
+
+Program.Sub.BulkFormatting.Start
+F.Intrinsic.Control.Try
+V.Local.sCol.Declare
+V.Local.sVal.Declare
+V.Local.iCnt.Declare
+V.Local.iVI.Declare
+
+F.Intrinsic.String.Split(V.Args.Cols,"*!*",V.Local.sCol)
+F.Intrinsic.String.Split(V.Args.Vals,"*!*",V.Local.sVal)
+
+V.Local.iVI.Set(-1)
+F.Intrinsic.Control.For(V.Local.iCnt,V.Local.sCol.UBound)
+	F.Intrinsic.Control.If(V.Local.sCol.UBound,=,V.Local.sVal.UBound)
+		Gui.[V.Args.FORM].[V.Args.GSGC].SetColumnProperty(V.Args.GV,V.Local.sCol(V.Local.iCnt),V.Args.Prop,V.Local.sVal(V.Local.iCnt))
+	F.Intrinsic.Control.ElseIf(V.Args.Prop,=,V.Enum.ColumnPropertyNames!VisibleIndex)
+		Gui.[V.Args.FORM].[V.Args.GSGC].SetColumnProperty(V.Args.GV,V.Local.sCol(V.Local.iCnt),V.Args.Prop,V.Local.iVI.++)
+	F.Intrinsic.Control.Else
+		Gui.[V.Args.FORM].[V.Args.GSGC].SetColumnProperty(V.Args.GV,V.Local.sCol(V.Local.iCnt),V.Args.Prop,V.Local.sVal)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.iCnt)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.BulkFormatting.End
+
+Program.Sub.Serialize.Start
+F.Intrinsic.Control.Try
+V.Local.sSerialize.Declare
+
+Gui.F_Main.GsGcMain.Serialize("gvOrders",V.Local.sSerialize)
+
+F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"GAB 301 - Gridviews.g2u",20250312,1000,False,"Serialize",False,0,-999.0,1/1/1980,12:00:00 AM,V.Local.sSerialize)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Serialize.End
+
+Program.Sub.Deserialize.Start
+F.Intrinsic.Control.Try
+V.Local.sSerialize.Declare
+
+'0 - Boolean
+'1 - Integer
+'2 - Float
+'3 - Date
+'4 - Time
+'5 - String
+'6 - Extended String - VVal
+
+F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"GAB 301 - Gridviews.g2u",20250312,1000,6,"",V.Local.sSerialize)
+
+F.Intrinsic.Control.If(V.Local.sSerialize.Trim,<>,"")
+	Gui.F_Main.GsGcMain.Deserialize(V.Local.sSerialize)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Deserialize.End
+
+#Region "Events"
+
+Program.Sub.cmdRefresh_Click.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.If(V.DataTable.dtOrders.Exists)
+	F.Intrinsic.Control.CallSub(Serialize)
+	F.Data.DataTable.Close("dtOrders")
+F.Intrinsic.Control.EndIf
+
+Gui.F_Main.GsGcMain.Enabled(False)
+Gui.F_Main.GsGcMain.SuspendLayout
+
+F.Intrinsic.Control.CallSub(LoadData)
+F.Intrinsic.Control.CallSub(FormatGrid)
+F.Intrinsic.Control.CallSub(Deserialize)
+
+Gui.F_Main.GsGcMain.ResumeLayout
+Gui.F_Main.GsGcMain.Enabled(True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdRefresh_Click.End
+
+Program.Sub.cmdExport_Click.Start
+F.Intrinsic.Control.Try
+'V.Local.sPath.Declare
+
+'F.Intrinsic.UI.ShowSaveFileDialog("","xlsx | *.xlsx",V.Local.sPath)
+
+Gui.F_Main.GsGcMain.Export("E:\ACC Courses\Avery  - Mar 2025\GAB 301\Export.xlsx","XLSX")
+
+F.Intrinsic.Task.ShellExec(0,"","Export.xlsx","","E:\ACC Courses\Avery  - Mar 2025\GAB 301\",1)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdExport_Click.End
+
+Program.Sub.GsGcMain_CellValueChanged.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.If(V.Args.Column.UCase,=,"NOTES")
+	F.Data.DataTable.Create("dtSave",False) ' Note:  If you set the global scope to false, GAB will automatically close the datatable when exiting the sub.  If you set it to be true you need to close the datatable.
+	F.Data.DataTable.AddColumn("dtSave","ORDER_NO","String")
+	F.Data.DataTable.AddColumn("dtSave","ORDER_LINE","String")
+	F.Data.DataTable.AddColumn("dtSave","NOTES","String")
+	
+	F.Data.DataTable.AddRow("dtSave","ORDER_NO",V.DataTable.dtOrders(V.Args.RowIndex).ORDER_NO!FieldVal,"ORDER_LINE",V.DataTable.dtOrders(V.Args.RowIndex).ORDER_LINE!FieldVal,"NOTES",V.Args.Value)
+	
+	F.Intrinsic.Control.CallSub(ODBC_OPEN)
+		F.Data.DataTable.SaveToDB("dtSave","conts","GCG_DASHBOARD_NOTES","ORDER_NO*!*ORDER_LINE",256)
+	F.Intrinsic.Control.CallSub(ODBC_CLOSE)
+	
+	F.Data.DataTable.Close("dtSave") ' good idea to close the datatable manually anyway.
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.GsGcMain_CellValueChanged.End
+
+Program.Sub.GsGcMain_RowCellClick.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.SelectCase(V.Args.Column.UCase)
+	F.Intrinsic.Control.Case("ORDER_NO")
+		F.Data.DataTable.AddRow("200000","OrdNum",V.Args.CellValue,"Mode","V","CustNum",V.DataTable.dtOrders(V.Args.RowIndex).CUSTOMER!FieldVal)
+		Gui.F_Main..Enabled(False)
+		F.Intrinsic.Control.CallSub(200000Sync)
+		Gui.F_Main..Enabled(True)
+		Gui.F_Main..SetFocus
+	F.Intrinsic.Control.Case("PART")
+		F.Data.DataTable.AddRow("300011","Part",V.Args.CellValue,"Location",V.DataTable.dtOrders(V.Args.RowIndex).LOCATION.FieldVal,"Switch","")
+		Gui.F_Main..Enabled(False)
+		F.Intrinsic.Control.CallSub(300011Sync)
+		Gui.F_Main..Enabled(True)
+		Gui.F_Main..SetFocus
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.GsGcMain_RowCellClick.End
+
+#End Region ' Events
+
+Program.Sub.ODBC_OPEN.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.If(V.ODBC.conts.Exists,=,False)
+	F.ODBC.Connection!conts.OpenCompanyConnection
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.ODBC_OPEN.End
+
+Program.Sub.ODBC_CLOSE.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.If(V.ODBC.conts.Exists)
+	F.ODBC.Connection!conts.Close
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.ODBC_CLOSE.End
+
+Program.Sub.F_Main_UnLoad.Start
+F.Intrinsic.Control.If(V.DataTable.dtOrders.Exists)
+	F.Intrinsic.Control.CallSub(Serialize)
+	F.Data.DataTable.Close("dtOrders")
+F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.End
+Program.Sub.F_Main_UnLoad.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Ambient.SubroutineCalledFrom, V.Ambient.ErrorNumber, V.Ambient.ErrorDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Ambient.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250312132142377$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcBb7pSZaKlnWlOSe4VvH2enVOPBHuOnVBE=
+${$7$}$File Version:1.1.20250312182142.0
+Program.Sub.Comments.End
