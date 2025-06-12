@@ -1,0 +1,44 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+V.Local.sSQL.Declare
+V.Local.iCnt.Declare
+V.Local.sRowSplit.Declare
+V.Local.sRet.Declare
+
+'F.Global.General.OverrideCompany(PLA)
+
+'F.ODBC.Connection!comm.OpenCommonConnection
+'F.ODBC.Connection!comm.Close
+
+'Execute - Insert, Update, Delete statements
+'ExecuteAndReturn - Select statements
+
+F.ODBC.Connection!con.OpenCompanyConnection
+	F.ODBC.Connection!con.ExecuteAndReturn("Select top 10 PART,LOCATION,CODE_ABC,PRODUCT_LINE,DESCRIPTION from INVENTORY_MSTR where QTY_ONHAND = 0",V.Local.sSQL)
+
+	'*!* is the inner delimiter
+	'#$# is the outer delimiter
+	F.Intrinsic.String.Split(V.Local.sSQL,"#$#",V.Local.sRet)
+	
+	F.Intrinsic.Control.For(V.Local.iCnt,V.Local.sRet.UBound)
+		F.Intrinsic.String.Split(V.Local.sRet(V.Local.iCnt),"*!*",V.Local.sRowSplit)
+		
+		F.Intrinsic.String.Build("Insert into GCG_CUSTOM_TABLE (PART,LOC,PUSER1,PUSER2) values('{0}','{1}','{2}','{3}')",V.Local.sRowSplit(0).Trim,V.Local.sRowSplit(1).Trim,V.Local.sRowSplit(3).Trim,V.Local.sRowSplit(4).PSQLFriendly,V.Local.sSQL)
+		
+		F.ODBC.Connection!con.Execute(V.Local.sSQL)
+		
+	F.Intrinsic.Control.Next(V.Local.iCnt)
+
+F.ODBC.Connection!con.Close
+
+
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9133.25878$}$1
+${$6$}$tsmith$}$20250311103445325$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcBA/CVYmkl+/lKCcNPT+or9AAeonY/zxQE=
+${$7$}$File Version:1.1.20250311153445.0
+Program.Sub.Comments.End
