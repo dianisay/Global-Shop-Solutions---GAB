@@ -1,3 +1,5 @@
+'This GAB script loads order line data (V_ORDER_LINES) and inventory data (V_INVENTORY_ALL), then performs a left join to enrich order lines with inventory fields (like on-hand quantity and product line). The result is saved into a new DataTable called dtSOs.
+
 Program.Sub.Preflight.Start
 ' No preflight logic needed
 Program.Sub.Preflight.End
