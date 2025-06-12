@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<notes>
+  <note>
+    <To>Tove</To>
+    <From>Jani</From>
+    <Heading>Reminder</Heading>
+    <Body>Don't forget this weekend!</Body>
+  </note>
+  <note>
+    <To>Travis</To>
+    <From>Me</From>
+    <Heading>Title</Heading>
+    <Body>I love GAB!</Body>
+  </note>
+</notes>

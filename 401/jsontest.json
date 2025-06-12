@@ -1,0 +1,27 @@
+{
+  "Property1": "Value1",
+  "Property2": 2,
+  "Property3": "11/3/2021",
+  "Property4": true,
+  "Property5": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "Property6": {
+    "Property7": "nested"
+  },
+  "Property8": [
+    {
+      "Property9":"nested1"
+    },
+    {
+      "Property9":"nested2"
+    },
+    {
+      "Property9":"nested3"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+V.Local.sFilePath.Declare
+
+'F.Communication.FTP.SetProperty("RemoteHost","LocalHost")
+'F.Communication.FTP.SetProperty("RemotePort","21")
+'F.Communication.FTP.SetProperty("User","User")
+'F.Communication.FTP.SetProperty("Password","123456")
+
+'F.Communication.FTP.Logon
+
+'Upload File
+'F.Communication.FTP.SetProperty("RemotePath","/UPLOAD")
+'F.Communication.FTP.SetProperty("Overwrite",True)
+
+'F.Intrinsic.UI.ShowOpenFileDialog("","",V.Local.sFilePath)
+'F.Communication.FTP.SetProperty("LocalFile",V.Local.sFilePath)
+'F.Communication.FTP.SetProperty("RemoteFile","Upload_File_20250313.txt")
+
+'F.Communication.FTP.Upload
+'F.Communication.FTP.Logoff
+
+'Download File
+'F.Communication.FTP.SetProperty("RemotePath","/DOWNLOAD")
+'F.Communication.FTP.SetProperty("Overwrite",True)
+
+'F.Intrinsic.Control.AddEventHandler("FTPDirList",FTPDirListing)
+
+'F.Communication.FTP.SetProperty("RemoteFile","")
+'F.Communication.FTP.ListDirectoryLong
+
+'HTTP download
+'F.Communication.HTTP.SetProperty("User","User") ' Only if needed
+'F.Communication.HTTP.SetProperty("Password","Password") ' Only if needed
+
+'F.Communication.HTTP.DownloadFile("http://gdm-catalog-fmapi-prod.imgix.net/ProductLogo/72098464-0a25-4c42-9ab6-796c3e1e7a79.png","E:\ACC Courses\Avery  - Mar 2025\GAB 401\Logo_20250313.png")
+
+'HTTP Upload
+F.Communication.HTTP.Put("*REMOTE URL*","E:\ACC Courses\Avery  - Mar 2025\GAB 401\Logo_20250313.png") ' Or
+F.Communication.HTTP.Post("*REMOTE URL*","E:\ACC Courses\Avery  - Mar 2025\GAB 401\Logo_20250313.png") ' possible username and password.  Check with web host.
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.FTPDirListing.Start
+F.Intrinsic.Control.Try
+V.Local.sRet.Declare
+Function.Intrinsic.Debug.InvokeDebugger
+Function.Intrinsic.Debug.Stop
+
+F.Intrinsic.Control.If(V.Args.IsDir.Not)
+	F.Intrinsic.UI.ShowSaveFileDialog(V.Args.FileName,"",V.Local.sRet)
+	F.Communication.FTP.SetProperty("LocalFile",V.Local.sRet)
+	F.Communication.FTP.SetProperty("RemoteFile",V.Args.FileName)
+	F.Communication.FTP.Download
+	'F.Communication.FTP.DeleteFile(V.Args.FileName)
+	F.Communication.FTP.Logoff
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.FTPDirListing.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Ambient.SubroutineCalledFrom, V.Ambient.ErrorNumber, V.Ambient.ErrorDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Ambient.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250313104135726$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcBXpGfFUYoCBzUAmA1YJBcOXV0sr7lcKcg=
+${$7$}$File Version:1.1.20250313154135.0
+Program.Sub.Comments.End

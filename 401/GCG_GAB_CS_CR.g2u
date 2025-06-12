@@ -1,0 +1,86 @@
+﻿Program.Sub.Preflight.Start
+V.Global.iBIReportID.Declare
+V.Global.iBIReportID.Set(100028)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+V.Local.sParams.Declare
+V.Local.sValues.Declare
+V.Local.iReportID.Declare
+V.Local.sReportID.Declare
+V.Local.iBIRun.Declare
+V.Local.iBILog.Declare
+V.Local.iRet.Declare
+
+F.Global.BI.GetRunID(V.Local.iBiRun)
+
+''Crystal Reports
+'F.Global.BI.GetIDFromName("SF_BarCodeWO_EXT.rpt",True,V.Local.iReportId)
+'F.Global.BI.StartLogging(V.Local.iBiRun,V.Local.iReportId,-1,"",V.Local.iBiLog)
+
+'V.Local.sParams.Set("Terminal*!*MATLBAR*!*OUTBAR*!*REPORTID")
+
+'F.Intrinsic.String.LPad(V.Local.iReportID,"0",6,V.Local.sReportID)
+
+'F.Intrinsic.String.Build("{0}*!*Y*!*Y*!*{1}",V.Caller.Terminal,V.Local.sReportId,V.Local.sValues)
+
+'F.Global.BI.StopLogging(V.Local.iBiLog)
+
+''Preview report
+'F.Global.BI.RunReportPreProcessor(V.Local.iBIRun,V.Local.iBILog,V.Local.sParams,V.Local.sValues,"",16,False,"",0,"",0,"","",V.Local.iRet)
+
+''Modes:
+''1 - Use Default
+''2 – Email
+''4 – Save
+''8 – Print
+''16 – View
+''Save Types:
+''0 – PDF
+''1 – CSV
+''2 – XLS
+
+''Save report
+''F.Global.BI.RunReportPreProcessor(V.Local.iBIRun,V.Local.iBiLog,V.Local.sParams,V.Local.sValues,"",4,False,"",0,"",0,"PATH TO SAVE FILE LOCATION","",V.Local.iRet)
+
+'CodeSoft
+F.ODBC.Connection!con.OpenCompanyConnection
+
+F.Data.DataTable.CreateFromSQL("dtPart","con","select top 2 'Column Value' as COLUMN_1, rtrim(PART) as PART, QTY_ONHAND from V_INVENTORY_MSTR where QTY_ONHAND <> 0;")
+F.ODBC.Connection!con.Close
+
+F.Global.BI.StartLogging(V.Local.iBiRun,100028,-1,"CodeSoft.lab",V.Local.iBiLog)
+
+F.Global.BI.StopLogging(V.Local.iBiLog)
+
+'http://gab.gss-help.com/index.php?title=Function.Global.BI.PrintCodeSoftLabelFromDataTable
+F.Global.BI.PrintCodeSoftLabelFromDataTable(V.Local.iBiRun,V.Local.iBiLog,"dtPart","",False)
+
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Ambient.SubroutineCalledFrom, V.Ambient.ErrorNumber, V.Ambient.ErrorDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Ambient.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250313130005445$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcD91sONT4IxtGvFTxVRkx+bBZzy6zxxJyQ=
+${$7$}$File Version:1.1.20250313180005.0
+Program.Sub.Comments.End

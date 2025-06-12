@@ -1,0 +1,258 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.frmWeather..Create(BaseForm)
+Gui.frmWeather..Caption("Enter City and State to get the weather")
+Gui.frmWeather..Size(551,212)
+Gui.frmWeather..MinX(0)
+Gui.frmWeather..MinY(0)
+Gui.frmWeather..Position(0,0)
+Gui.frmWeather..AlwaysOnTop(False)
+Gui.frmWeather..FontName("Tahoma")
+Gui.frmWeather..FontSize(8.25)
+Gui.frmWeather..ControlBox(True)
+Gui.frmWeather..MaxButton(True)
+Gui.frmWeather..MinButton(True)
+Gui.frmWeather..MousePointer(0)
+Gui.frmWeather..Moveable(True)
+Gui.frmWeather..Sizeable(True)
+Gui.frmWeather..ShowInTaskBar(True)
+Gui.frmWeather..TitleBar(True)
+Gui.frmWeather..Event(UnLoad,frmWeather_UnLoad)
+Gui.frmWeather.txtState.Create(TextBox,"",True,38,20,0,241,26,True,0,"Tahoma",8.25,,1)
+Gui.frmWeather.txtState.TabStop(True)
+Gui.frmWeather.txtState.TabIndex(2)
+Gui.frmWeather.txtCity.Create(TextBox,"",True,226,20,0,12,26,True,0,"Tahoma",8.25,,1)
+Gui.frmWeather.txtCity.TabStop(True)
+Gui.frmWeather.txtCity.TabIndex(1)
+Gui.frmWeather.lblState.Create(Label,"State",True,31,13,0,241,10,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblState.BorderStyle(0)
+Gui.frmWeather.lblState.FontStyle(True,False,False,False,False)
+Gui.frmWeather.lblCity.Create(Label,"City",True,22,13,0,12,10,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblCity.BorderStyle(0)
+Gui.frmWeather.lblCity.FontStyle(True,False,False,False,False)
+Gui.frmWeather.cmdRetrieve.Create(Button)
+Gui.frmWeather.cmdRetrieve.Enabled(True)
+Gui.frmWeather.cmdRetrieve.Visible(True)
+Gui.frmWeather.cmdRetrieve.Zorder(0)
+Gui.frmWeather.cmdRetrieve.Size(83,23)
+Gui.frmWeather.cmdRetrieve.Position(283,24)
+Gui.frmWeather.cmdRetrieve.Caption("Get Weather")
+Gui.frmWeather.cmdRetrieve.FontName("Tahoma")
+Gui.frmWeather.cmdRetrieve.FontSize(8.25)
+Gui.frmWeather.cmdRetrieve.FontStyle(True,False,False,False,False)
+Gui.frmWeather.cmdRetrieve.Event(Click,cmdRetrieve_Click)
+Gui.frmWeather.cmdRetrieve.TabStop(True)
+Gui.frmWeather.cmdRetrieve.TabIndex(3)
+Gui.frmWeather.frameWeather.Create(Frame)
+Gui.frmWeather.frameWeather.Enabled(True)
+Gui.frmWeather.frameWeather.Visible(True)
+Gui.frmWeather.frameWeather.Zorder(0)
+Gui.frmWeather.frameWeather.Size(529,57)
+Gui.frmWeather.frameWeather.Position(4,53)
+Gui.frmWeather.frameWeather.Caption("")
+Gui.frmWeather.frameWeather.FontName("Tahoma")
+Gui.frmWeather.frameWeather.FontSize(8.25)
+Gui.frmWeather.lblHumidity.Create(Label,"Humidity",True,51,13,0,419,8,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblHumidity.BorderStyle(0)
+Gui.frmWeather.lblHumidity.Parent("frameWeather")
+Gui.frmWeather.lblHumidity.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtTempHigh.Create(TextBox,"",True,100,26,0,316,23,True,2,"Tahoma",12,,1)
+Gui.frmWeather.txtTempHigh.Parent("frameWeather")
+Gui.frmWeather.txtTempHigh.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtTempHigh.Locked(True)
+Gui.frmWeather.txtTempLow.Create(TextBox,"",True,100,26,0,213,23,True,2,"Tahoma",12,,1)
+Gui.frmWeather.txtTempLow.Parent("frameWeather")
+Gui.frmWeather.txtTempLow.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtTempLow.Locked(True)
+Gui.frmWeather.lblTempHigh.Create(Label,"Today's High",True,72,13,0,316,8,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblTempHigh.BorderStyle(0)
+Gui.frmWeather.lblTempHigh.Parent("frameWeather")
+Gui.frmWeather.lblTempHigh.FontStyle(True,False,False,False,False)
+Gui.frmWeather.lblTemp.Create(Label,"Temperature",True,75,13,0,7,8,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblTemp.BorderStyle(0)
+Gui.frmWeather.lblTemp.Parent("frameWeather")
+Gui.frmWeather.lblTemp.FontStyle(True,False,False,False,False)
+Gui.frmWeather.lblTempLow.Create(Label,"Today's Low",True,69,13,0,213,8,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblTempLow.BorderStyle(0)
+Gui.frmWeather.lblTempLow.Parent("frameWeather")
+Gui.frmWeather.lblTempLow.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtHumidity.Create(TextBox,"",True,100,26,0,419,23,True,2,"Tahoma",12,,1)
+Gui.frmWeather.txtHumidity.Parent("frameWeather")
+Gui.frmWeather.txtHumidity.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtHumidity.Locked(True)
+Gui.frmWeather.txtFeels.Create(TextBox,"",True,100,26,0,110,23,True,2,"Tahoma",12,,1)
+Gui.frmWeather.txtFeels.Parent("frameWeather")
+Gui.frmWeather.txtFeels.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtFeels.Locked(True)
+Gui.frmWeather.lblFeels.Create(Label,"Feels like",True,52,13,0,110,8,True,0,"Tahoma",8.25,,0,0)
+Gui.frmWeather.lblFeels.BorderStyle(0)
+Gui.frmWeather.lblFeels.Parent("frameWeather")
+Gui.frmWeather.lblFeels.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtTemp.Create(TextBox,"",True,100,26,0,7,23,True,2,"Tahoma",12,,1)
+Gui.frmWeather.txtTemp.Parent("frameWeather")
+Gui.frmWeather.txtTemp.FontStyle(True,False,False,False,False)
+Gui.frmWeather.txtTemp.Locked(True)
+Gui.frmWeather.cmdOpenMap.Create(Button)
+Gui.frmWeather.cmdOpenMap.Enabled(True)
+Gui.frmWeather.cmdOpenMap.Visible(True)
+Gui.frmWeather.cmdOpenMap.Zorder(0)
+Gui.frmWeather.cmdOpenMap.Size(176,23)
+Gui.frmWeather.cmdOpenMap.Position(180,126)
+Gui.frmWeather.cmdOpenMap.Caption("Open Map")
+Gui.frmWeather.cmdOpenMap.FontName("Tahoma")
+Gui.frmWeather.cmdOpenMap.FontSize(12)
+Gui.frmWeather.cmdOpenMap.FontStyle(True,False,False,False,False)
+Gui.frmWeather.cmdOpenMap.Event(Click,cmdOpenMap_Click)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+
+Gui.frmWeather..Show
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.cmdRetrieve_Click.Start
+F.Intrinsic.Control.Try
+V.Local.sFile.Declare
+V.Local.sURL.Declare
+V.Local.sCity.Declare
+V.Local.sState.Declare
+V.Local.sMapUrl.Declare
+V.Local.sTemperature.Declare
+V.Local.sFeelsLike.Declare
+V.Local.sHigh.Declare
+V.Local.sLow.Declare
+V.Local.sHumidity.Declare
+V.Local.sTemp.Declare
+
+F.Intrinsic.Control.If(V.Screen.frmWeather!txtCity.Text.Trim,=,"")
+	F.Intrinsic.UI.Msgbox("Please enter a U.S. city","Error")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.ElseIf(V.Screen.frmWeather!txtState.Text.Trim,=,"")
+	F.Intrinsic.UI.Msgbox("Please enter a U.S. state","Error")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+V.Local.sCity.Set(V.Screen.frmWeather!txtCity.Text.Trim)
+V.Local.sState.Set(V.Screen.frmWeather!txtState.Text.Trim)
+
+'Cities with spaces in the name need a plus symbol between the words. For example; San+Francisco
+F.Intrinsic.String.Replace(V.Local.sCity," ","+",V.Local.sCity)
+
+F.Intrinsic.String.Build("api.openweathermap.org/data/2.5/weather?q={0},{1},US&appid=cf67ca430a3049057f5138e5dcbb17f6&units=imperial",V.Local.sCity,V.Local.sState,V.Local.sURL)
+
+F.Intrinsic.String.Build("{0}\{1}TEST.json",V.Caller.TempDir,V.Caller.CompanyCode,V.Local.sFile)
+
+F.Communication.REST.SetProperty("HTTPMethod","GET")
+F.Communication.REST.SetProperty("ContentType","application/json; charset=utf-8")
+F.Communication.REST.SetProperty("Accept","application/json")
+F.Communication.REST.SetProperty("LocalFile",V.Local.sFile)
+
+F.Communication.REST.Get(V.Local.sURL)
+
+F.Communication.JSON.ParseFile(V.Local.sFile)
+
+'Read Temperature
+V.Local.sTemp.Set("/json/main/temp")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+V.Local.sTemperature.Set(V.Local.sTemp)
+
+'Read Feels Like
+V.Local.sTemp.Set("/json/main/feels_like")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+V.Local.sFeelsLike.Set(V.Local.sTemp)
+
+'Read today's low
+V.Local.sTemp.Set("/json/main/temp_min")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+V.Local.sLow.Set(V.Local.sTemp)
+
+
+'Read today's high
+V.Local.sTemp.Set("/json/main/temp_max")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+V.Local.sHigh.Set(V.Local.sTemp)
+
+'Read humidity
+V.Local.sTemp.Set("/json/main/humidity")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+F.Intrinsic.String.Build("{0} %",V.Local.sTemp,V.Local.sHumidity)
+
+'Display on screen
+Gui.frmWeather.txtTemp.Text(V.Local.sTemperature)
+Gui.frmWeather.txtFeels.Text(V.Local.sFeelsLike)
+Gui.frmWeather.txtTempLow.Text(V.Local.sLow)
+Gui.frmWeather.txtTempHigh.Text(V.Local.sHigh)
+Gui.frmWeather.txtHumidity.Text(V.Local.sHumidity)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdRetrieve_Click.End
+
+Program.Sub.cmdOpenMap_Click.Start
+F.Intrinsic.Control.Try
+V.Local.sTemp.Declare
+V.Local.sLat.Declare
+V.Local.sLon.Declare
+V.Local.sMapUrl.Declare
+
+'Open map to the coordinates captured in the API
+
+V.Local.sTemp.Set("/json/coord/lon")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+V.Local.sLon.Set(V.Local.sTemp)
+
+V.Local.sTemp.Set("/json/coord/lat")
+F.Communication.JSON.SetProperty("XPath",V.Local.sTemp)
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.Replace(V.Local.sTemp,V.Ambient.DblQuote,"",V.Local.sTemp)
+V.Local.sLat.Set(V.Local.sTemp)
+
+F.Intrinsic.String.Build("https://openweathermap.org/weathermap?basemap=map&cities=true&layer=temperature&lat={0}&lon={1}&zoom=7",V.Local.sLat,V.Local.sLon,V.Local.sMapUrl)
+
+F.Intrinsic.Task.ShellExec(0,"Open",V.Local.sMapUrl,"","",0)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdOpenMap_Click.End
+
+Program.Sub.frmWeather_UnLoad.Start
+F.Intrinsic.Control.End
+Program.Sub.frmWeather_UnLoad.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("({5}-{6}){0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Args.SubRoutine, V.Args.eNumber, V.Args.eDescription,V.Caller.ScriptFile,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250313082124094$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcC9McF+hXZ+ADbY4ywT+tvtKxQTw07J3WQ=
+${$7$}$File Version:1.1.20250313132124.0
+Program.Sub.Comments.End

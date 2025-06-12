@@ -1,0 +1,11 @@
+<?xml version='1.0'?>
+<Breakfast_Menu>
+  <Food>
+    <Name>Belgian Waffles</Name>
+    <Price>$5.95</Price>
+  </Food>
+  <Food>
+    <Name>Strawberry Belgian Waffles</Name>
+    <Price>$7.95</Price>
+  </Food>
+</Breakfast_Menu>

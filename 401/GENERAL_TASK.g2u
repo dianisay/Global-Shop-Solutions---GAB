@@ -1,0 +1,64 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+V.Local.bRet.Declare
+V.Local.sRet.Declare
+
+'F.Intrinsic.Task.IsProgramRunning("excel.exe",V.Local.bRet)
+
+'F.Intrinsic.Task.PIDRunning(137080,V.Local.bRet)
+
+'F.Intrinsic.Task.GetTaskList(V.Local.sRet)
+
+'F.Intrinsic.Task.LaunchASync() ' LaunchSync - Launch outside programs
+'F.Intrinsic.Task.LaunchGSSASync("BJ020LZ","","","") ' LaunchGSSSync - Similar to running a 1Shot
+
+F.Intrinsic.Task.CreateLock() ' Creates a lock on a program so that it may only run in one place at a time.  Locks are reset when the program finishes running.
+F.Intrinsic.Task.CheckLock() ' Is the file already in use
+
+F.Global.General.CreateSoftLock() 'Creates a lock on GS screens (records) 
+F.Global.General.ReadSoftLock() ' Determine lock state
+F.Global.General.DestroySoftLock() ' Remove soft lock - Only good for removing softlocks that you have created.
+
+'	Supported modes are:
+'	WO - Work Order
+'	RT - Router
+'	SO - Sales Order
+'	PO - Purchase Order
+'	QT - Quote
+'	PR - Purchase Req
+'	KP - Contract
+'	TR - Transfer Order
+'	WS - Work Order Sequence
+'	BM - BOM
+
+F.Intrinsic.API. ' - used to talk directly with Windows – USE CAUTION!
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Ambient.SubroutineCalledFrom, V.Ambient.ErrorNumber, V.Ambient.ErrorDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Ambient.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250313122942863$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcAuhWFoaJDF+nMq4pz769malPaBzKtlzUk=
+${$7$}$File Version:1.1.20250313172942.0
+Program.Sub.Comments.End

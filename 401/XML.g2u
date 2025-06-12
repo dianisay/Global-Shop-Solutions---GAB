@@ -1,0 +1,132 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+F.Intrinsic.Control.Try
+V.Local.sHold.Declare
+V.Local.bVar.Declare
+V.Local.sMsg.Declare
+
+'Writing an XML Document
+'F.Global.XML.CreateDocument("xmlDoc",False,True,False,False)
+
+'F.Global.XML.SetRoot("xmlDoc","Breakfast_Menu")
+
+'F.Global.XML.CreateElementNode("xmlDoc","Food","")
+'F.Global.XML.AppendNodeToRoot("xmlDoc","Food")
+'F.Global.XML.CreateElementNode("xmlDoc","Name","Belgian Waffles")
+'F.Global.XML.AppendNode("xmlDoc","Food","Name")
+'F.Global.XML.DestroyNode("xmlDoc","Name")
+'F.Global.XML.CreateElementNode("xmlDoc","Price","$5.95")
+'F.Global.XML.AppendNode("xmlDoc","Food","Price")
+'F.Global.XML.DestroyNode("xmlDoc","Price")
+'F.Global.XML.DestroyNode("xmlDoc","Food")
+
+'F.Global.XML.CreateElementNode("xmlDoc","Food","")
+'F.Global.XML.AppendNodeToRoot("xmlDoc","Food")
+'F.Global.XML.CreateElementNode("xmlDoc","Name","Strawberry Belgian Waffles")
+'F.Global.XML.AppendNode("xmlDoc","Food","Name")
+'F.Global.XML.DestroyNode("xmlDoc","Name")
+'F.Global.XML.CreateElementNode("xmlDoc","Price","$7.95")
+'F.Global.XML.AppendNode("xmlDoc","Food","Price")
+'F.Global.XML.DestroyNode("xmlDoc","Price")
+'F.Global.XML.DestroyNode("xmlDoc","Food")
+
+'F.Global.XML.SaveDocument("xmlDoc","E:\ACC Courses\Avery  - Mar 2025\GAB 401","xml_example_20250313.xml")
+'F.Global.XML.CloseDocument("xmlDoc")
+
+'Exercise
+'F.Global.XML.CreateDocument("xmlDoc",False,True,False,False)
+'F.Global.XML.SetRoot("xmlDoc","notes")
+
+'F.Global.XML.CreateElementNode("xmlDoc","note","")
+'F.Global.XML.AppendNodeToRoot("xmlDoc","note")
+'F.Global.XML.CreateElementNode("xmlDoc","To","Tove")
+'F.Global.XML.AppendNode("xmlDoc","note","To")
+'F.Global.XML.DestroyNode("xmlDoc","To")
+'F.Global.XML.CreateElementNode("xmlDoc","From","Jani")
+'F.Global.XML.AppendNode("xmlDoc","note","From")
+'F.Global.XML.DestroyNode("xmlDoc","From")
+'F.Global.XML.CreateElementNode("xmlDoc","Heading","Reminder")
+'F.Global.XML.AppendNode("xmlDoc","note","Heading")
+'F.Global.XML.DestroyNode("xmlDoc","Heading")
+'F.Global.XML.CreateElementNode("xmlDoc","Body","Don't forget this weekend!")
+'F.Global.XML.AppendNode("xmlDoc","note","Body")
+'F.Global.XML.DestroyNode("xmlDoc","Body")
+
+'F.Global.XML.DestroyNode("xmlDoc","note")
+
+'F.Global.XML.CreateElementNode("xmlDoc","note","")
+'F.Global.XML.AppendNodeToRoot("xmlDoc","note")
+'F.Global.XML.CreateElementNode("xmlDoc","To","Travis")
+'F.Global.XML.AppendNode("xmlDoc","note","To")
+'F.Global.XML.DestroyNode("xmlDoc","To")
+'F.Global.XML.CreateElementNode("xmlDoc","From","Me")
+'F.Global.XML.AppendNode("xmlDoc","note","From")
+'F.Global.XML.DestroyNode("xmlDoc","From")
+'F.Global.XML.CreateElementNode("xmlDoc","Heading","Title")
+'F.Global.XML.AppendNode("xmlDoc","note","Heading")
+'F.Global.XML.DestroyNode("xmlDoc","Heading")
+'F.Global.XML.CreateElementNode("xmlDoc","Body","I love GAB!")
+'F.Global.XML.AppendNode("xmlDoc","note","Body")
+'F.Global.XML.DestroyNode("xmlDoc","Body")
+
+'F.Global.XML.SaveDocument("xmlDoc","E:\ACC Courses\Avery  - Mar 2025\GAB 401","xml_exercise_20250313.xml")
+'F.Global.XML.CloseDocument("xmlDoc")
+
+'Reading XML
+F.Global.XML.LoadDocument("xmlQuery","E:\ACC Courses\Avery  - Mar 2025\GAB 401\xml_exercise_20250313.xml",False,True,False,False)
+
+'F.Global.XML.Query("xmlQuery","noteTo","//note/To",False)
+'F.Global.XML.Query("xmlQuery","noteFrom","//note/From",False)
+F.Global.XML.Query("xmlQuery","noteHeading","//note/Heading",False)
+'F.Global.XML.Query("xmlQuery","noteBody","//note/Body",False)
+
+F.Intrinsic.Control.DoUntil(V.Local.bVar)
+
+	F.Intrinsic.Control.If(V.Local.bVar.Not)
+		F.Global.XML.ReadNodeSetValue("xmlQuery","noteHeading","text",V.Local.sHold)
+		F.Intrinsic.Control.If(V.Local.sMsg.Trim,=,"")
+			V.Local.sMsg.Set(V.Local.sHold)
+		F.Intrinsic.Control.Else
+			F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Ambient.NewLine,V.Local.sHold,V.Local.sMsg)
+		F.Intrinsic.Control.EndIf	
+	F.Intrinsic.Control.EndIf
+	
+	F.Global.XML.Next("xmlQuery","noteHeading",V.Local.bVar)
+F.Intrinsic.Control.Loop
+
+'F.Intrinsic.UI.Msgbox(V.Local.sMsg)
+
+F.Global.XML.CloseDocument("xmlQuery")
+
+'F.Data.DataTable.CreateFromXML("dtXML","E:\ACC Courses\Avery  - Mar 2025\GAB 401\Catalog.xml",True)
+Function.Intrinsic.Debug.InvokeDebugger
+Function.Intrinsic.Debug.Stop
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Ambient.SubroutineCalledFrom, V.Ambient.ErrorNumber, V.Ambient.ErrorDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Ambient.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.9194.26336$}$1
+${$6$}$tsmith$}$20250313121102690$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcDSNw04ySaHX08LhyExsHN5v7nu1GfxxYY=
+${$7$}$File Version:1.1.20250313171102.0
+Program.Sub.Comments.End
