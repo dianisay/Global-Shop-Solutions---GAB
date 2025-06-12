@@ -140,6 +140,8 @@ F.ODBC.Connection!con.OpenCompanyConnection
 	F.Data.DataTable.SaveToDB("dtCustom","con","GCG_CUSTOM_TABLE","PART*!*LOC",256,"")
 F.ODBC.Connection!con.Close
 
+		
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ' === Display the view in the UI grid ===
 Gui.F_Main.GsGcMain.AddGridviewFromDataview("gvClass","dtClass","dvClass")
 Gui.F_Main.GsGcMain.MainView("gvClass")
