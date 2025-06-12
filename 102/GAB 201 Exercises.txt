@@ -26,6 +26,6 @@ Using GAB, fill PUSER3 from INVENTORY_MSTR.WHO_CHG_LAST
 Exercise 5
 Moved to Session 3 (GAB 301)
 
-Exercise 6
+Exercise 6 ****
 Write a GAB program that, when executed, opens a sales order of your choice to view.  The use of a library is optional.
 
