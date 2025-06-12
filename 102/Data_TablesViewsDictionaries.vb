@@ -53,6 +53,8 @@ F.Data.DataTable.AddColumn("dtClass","ClassCurve","Float")
 F.Data.DataTable.AddExpressionColumn("dtClass","ClassStatus","String","IIF(IsNull(ClassDate,#1/1/2900#) > #03/11/2025#,'Upcoming',IIF(IsNull(ClassDate,#1/1/2900#) <= #03/11/2025#, 'PAST',''))")
 
 ' === Clone dtClass into dtClassTemp and add an extra column ===
+		'THIS IS WHAT I'LL DO IN A REAL LIFE SCENARIO
+		'IT ONLY CLONES STRUCTURE
 F.Data.DataTable.Clone("dtClass","dtClassTemp",True)
 F.Data.DataTable.AddColumn("dtClassTemp","ClassTEST","String")
 
@@ -73,29 +75,45 @@ F.Data.DataTable.Close("dtClassTemp")
 
 ' === Optionally compute average (commented out) ===
 ' F.Data.DataTable.Compute("dtClass","Avg([ClassScore])","[ClassScore] > 90",V.Local.sMsg)
+' F.Intrinsic.UI.MsgBox
 
-' === Generate new series IDs for ClassID ===
+' === Generate new series Numbers IDs ===
 F.Data.DataTable.SetSeries("dtClass","ClassID",101,100)
+
+' === Generate new series Dates ===
+'F.Data.DataTable.SetSeries("dtClass","ClassDate",03/11/2025,1,"yyyy")
+
+' === Generate new series Numbers IDs 000000 format ===		
+'F.Data.DataTable.AddColumn("dtClass","ClassIdStr","Str")
+'F.Data.DataTable.SetValueFormat("dtClass",-1,"ClassId","ClassIdStr","000000")
+'This will make the column look like 000001, 000040, and so on instead of 1, 40
 
 ' === Example looping over rows to build string output (no UI display) ===
 F.Intrinsic.Control.For(V.Local.iCnt,V.DataTable.dtClass.RowCount--)
 	F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.DataTable.dtClass(V.Local.iCnt).ClassDate!FieldValTrim,V.Ambient.NewLine,V.Local.sMsg)
 F.Intrinsic.Control.Next(V.Local.iCnt)
 
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
 ' === Create a DataView from dtClass with filtering and sorting ===
 F.Data.DataView.Create("dtClass","dvClass",22)
 F.Data.DataView.SetFilter("dtClass","dvClass","[ClassScore] > 93")
 F.Data.DataView.SetSort("dtClass","dvClass","[ClassID] desc")
 
-' === Set value inside view, create a new DataTable from the filtered view ===
+' === Set value inside view, modify DataTable from the filtered view ===
 F.Data.DataView.SetValue("dtClass","dvClass",-1,"ClassName","GAB 501")
-F.Data.DataView.ToDataTable("dtClass","dvClass","dtNewClass",True)
+	'I CHANGED THE DB MODIFYING THE DV
 
 ' === Convert view data to string and back into new DataTable ===
+F.Data.DataView.ToDataTable("dtClass","dvClass","dtNewClass",True)
 F.Data.DataView.ToString("dtClass","dvClass",V.DataTable.dtClass.FieldNames,"*!*","#$#",V.Local.sMsg)
 F.Data.DataTable.CreateFromString("dtString",V.Local.sMsg,V.DataTable.dtClass.FieldNames,"String*!*String*!*String*!*String*!*String*!*String*!*String*!*String","*!*","#$#",True)
 F.Data.DataTable.Close("dtString")
 
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+'Dictionaries store key-value pairs, so retrieving a value by key (like "Key3") is immediate, without needing to loop through rows.
 ' === Dictionary demo with overwrite and lookup ===
 F.Data.Dictionary.Create("dictDictionary")
 F.Data.Dictionary.AddItem("dictDictionary","Key1","Value1")
