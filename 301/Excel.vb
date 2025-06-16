@@ -1,4 +1,4 @@
-﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.Start
 Program.Sub.Preflight.End
 
 Program.Sub.Main.Start
@@ -19,44 +19,21 @@ F.Intrinsic.Control.If(V.Local.bCheck.Not)
 	F.Intrinsic.Control.EndIf
 F.Intrinsic.Control.EndIf
 
-'F.Automation.MSExcel.ReadSpreadsheet("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",V.Local.sSQL) ' Sheet delimiter &^&
-''F.Automation.OOCalc.ReadSpreadsheet("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",True,5,15,V.Local.sSQL)
-
-'F.Intrinsic.String.Split(V.Local.sSQL,"$!$",V.Local.sSQL)
-'V.Local.sCols.Set(V.Local.sSQL(0))
-
-'F.Intrinsic.Variable.RemoveArrayElementByOrdinal(V.Local.sSQL,0,V.Local.sSQL)
-'F.Intrinsic.String.Join(V.Local.sSQL,"$!$",V.Local.sSQL)
-
-'V.Local.sSQL.RedimPreserve(0,0)
-
-'F.Data.DataTable.CreateFromString("dtExcel",V.Local.sSQL,V.Local.sCols,"String*!*String*!*String*!*String*!*String","*!*","$!$",True)
-'F.Data.DataTable.AddRow("dtExcel","Column1","Value46","Column2","Value47","Column3","Value48","Column4","Value49","Column5","Value50")
-
-'F.Data.DataView.Create("dtExcel","dvSave",22)
-
-'F.Data.DataView.ToString("dtExcel","dvSave",V.DataTable.dtExcel.FieldNames,"*!*","$!$",V.Local.sExcelSave)
-
-'F.Intrinsic.String.Build("{0}$!${1}",V.DataTable.dtExcel.FieldNames,V.Local.sExcelSave,V.Local.sExcelSave)
-
-'F.Intrinsic.File.IsFileLocked("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",V.Local.bCheck)
-
-'F.Intrinsic.Control.If(V.Local.bCheck)
-'	F.Intrinsic.UI.Msgbox("Please close the Excel file","Error - File In Use")
-'	F.Intrinsic.Control.End
-'F.Intrinsic.Control.EndIf
-
-'F.Automation.MSExcel.WriteSpreadsheet("E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx",V.Local.sExcelSave)
-
-'F.Data.DataView.Close("dtExcel","dvSave")
-'F.Data.DataTable.Close("dtExcel")
+F.Intrinsic.File.IsFileLocked("C:\Users\droldan\Desktop\excel.xlsx",V.Local.bCheck)
+F.Intrinsic.Control.If(V.Local.bCheck)
+    F.Intrinsic.UI.Msgbox("Please close the Excel file","Error - File In Use")
+    F.Intrinsic.Control.End
+F.Intrinsic.Control.EndIf
 
 F.Automation.MSExcel.CreateAppObject("oExcel")
-F.Automation.MSExcel.OpenWorkbook("oExcel","oBook","E:\ACC Courses\Avery  - Mar 2025\GAB 301\excel.xlsx")
+F.Automation.MSExcel.OpenWorkbook("oExcel","oBook","C:\Users\droldan\Desktop\excel.xlsx")
 F.Automation.MSExcel.OpenWorksheet("oBook","oSheet",1)
 
 F.Automation.MSExcel.RowCount("oSheet",V.Local.iRowCount)
-F.Automation.MSExcel.WriteCell("oSheet",1,6,"ColumnNew6")
+F.Automation.MSExcel.WriteCell("oSheet",1,6,"Hi")
+F.Automation.MSExcel.WriteCell("oSheet",2,6,"We")
+F.Automation.MSExcel.WriteCell("oSheet",3,6,"Are")
+F.Automation.MSExcel.WriteCell("oSheet",4,6,"New")
 
 F.Automation.MSExcel.SaveWorkbook("oBook")
 
@@ -89,7 +66,7 @@ F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
 Program.Sub.Error.End
 
 Program.Sub.Comments.Start
-${$5$}$20.1.9194.26336$}$1
-${$6$}$tsmith$}$20250312134856246$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcBFz/qj326DSViMhXv2gQkNSg764FUScZE=
-${$7$}$File Version:1.1.20250312184856.0
+${$5$}$23.1.9243.18408$}$1
+${$6$}$droldan$}$20250616091018978$}$B2femnEqbLfZe6KOMlAUIUDbLEceswGWHv6wtu8ZCLLdhAkgaNHsPKhttYD3jtkL2gTEdynjDmY=
+${$7$}$File Version:1.1.20250616141018.1
 Program.Sub.Comments.End
