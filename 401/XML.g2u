@@ -1,4 +1,4 @@
-﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.Start
 Program.Sub.Preflight.End
 
 Program.Sub.Main.Start
@@ -8,7 +8,8 @@ V.Local.sHold.Declare
 V.Local.bVar.Declare
 V.Local.sMsg.Declare
 
-'Writing an XML Document
+'========================================CREATE A XML FILE=========================================
+''Writing an XML Document
 'F.Global.XML.CreateDocument("xmlDoc",False,True,False,False)
 
 'F.Global.XML.SetRoot("xmlDoc","Breakfast_Menu")
@@ -23,6 +24,8 @@ V.Local.sMsg.Declare
 'F.Global.XML.DestroyNode("xmlDoc","Price")
 'F.Global.XML.DestroyNode("xmlDoc","Food")
 
+''JUST COPY PASTE
+
 'F.Global.XML.CreateElementNode("xmlDoc","Food","")
 'F.Global.XML.AppendNodeToRoot("xmlDoc","Food")
 'F.Global.XML.CreateElementNode("xmlDoc","Name","Strawberry Belgian Waffles")
@@ -33,10 +36,11 @@ V.Local.sMsg.Declare
 'F.Global.XML.DestroyNode("xmlDoc","Price")
 'F.Global.XML.DestroyNode("xmlDoc","Food")
 
-'F.Global.XML.SaveDocument("xmlDoc","E:\ACC Courses\Avery  - Mar 2025\GAB 401","xml_example_20250313.xml")
+''Notice you provide the path to save and then what you want toi name it.
+'F.Global.XML.SaveDocument("xmlDoc","C:\Users\droldan\Downloads","xml_example_20250313.xml")
 'F.Global.XML.CloseDocument("xmlDoc")
 
-'Exercise
+'=============================CREATE A XML FILE======================================
 'F.Global.XML.CreateDocument("xmlDoc",False,True,False,False)
 'F.Global.XML.SetRoot("xmlDoc","notes")
 
@@ -72,36 +76,47 @@ V.Local.sMsg.Declare
 'F.Global.XML.AppendNode("xmlDoc","note","Body")
 'F.Global.XML.DestroyNode("xmlDoc","Body")
 
-'F.Global.XML.SaveDocument("xmlDoc","E:\ACC Courses\Avery  - Mar 2025\GAB 401","xml_exercise_20250313.xml")
+'F.Global.XML.SaveDocument("xmlDoc","C:\Users\droldan\Downloads","xml_exercise_20250314.xml")
 'F.Global.XML.CloseDocument("xmlDoc")
 
+'===============================================old methods 'Reading XML================================================================
 'Reading XML
-F.Global.XML.LoadDocument("xmlQuery","E:\ACC Courses\Avery  - Mar 2025\GAB 401\xml_exercise_20250313.xml",False,True,False,False)
+F.Global.XML.LoadDocument("xmlQuery","C:\Users\droldan\Downloads\xml_exercise_20250314.xml",False,True,False,False)
 
+'OLD WAY, LESS EFICIENT:
 'F.Global.XML.Query("xmlQuery","noteTo","//note/To",False)
 'F.Global.XML.Query("xmlQuery","noteFrom","//note/From",False)
-F.Global.XML.Query("xmlQuery","noteHeading","//note/Heading",False)
+'F.Global.XML.Query("xmlQuery","noteHeading","//note/Heading",False)
 'F.Global.XML.Query("xmlQuery","noteBody","//note/Body",False)
 
-F.Intrinsic.Control.DoUntil(V.Local.bVar)
+''NEW WAY, MORE EFFICIENT
+''You can play around changing "//note/Heading"
+'F.Global.XML.Query("xmlQuery","noteHeading","//note/Heading",False)
+'F.Intrinsic.Control.DoUntil(V.Local.bVar)
 
-	F.Intrinsic.Control.If(V.Local.bVar.Not)
-		F.Global.XML.ReadNodeSetValue("xmlQuery","noteHeading","text",V.Local.sHold)
-		F.Intrinsic.Control.If(V.Local.sMsg.Trim,=,"")
-			V.Local.sMsg.Set(V.Local.sHold)
-		F.Intrinsic.Control.Else
-			F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Ambient.NewLine,V.Local.sHold,V.Local.sMsg)
-		F.Intrinsic.Control.EndIf	
-	F.Intrinsic.Control.EndIf
-	
-	F.Global.XML.Next("xmlQuery","noteHeading",V.Local.bVar)
-F.Intrinsic.Control.Loop
+'	F.Intrinsic.Control.If(V.Local.bVar.Not)
+'		F.Global.XML.ReadNodeSetValue("xmlQuery","noteHeading","text",V.Local.sHold)
+'		F.Intrinsic.Control.If(V.Local.sMsg.Trim,=,"")
+'			V.Local.sMsg.Set(V.Local.sHold)
+'		F.Intrinsic.Control.Else
+'			F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sMsg,V.Ambient.NewLine,V.Local.sHold,V.Local.sMsg)
+'		F.Intrinsic.Control.EndIf	
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Global.XML.Next("xmlQuery","noteHeading",V.Local.bVar)
+'F.Intrinsic.Control.Loop
 
 'F.Intrinsic.UI.Msgbox(V.Local.sMsg)
 
-F.Global.XML.CloseDocument("xmlQuery")
+'F.Global.XML.CloseDocument("xmlQuery")
 
-'F.Data.DataTable.CreateFromXML("dtXML","E:\ACC Courses\Avery  - Mar 2025\GAB 401\Catalog.xml",True)
+'===============================================new methods Reading XML================================================================
+
+Function.Intrinsic.Control.ErrorResume(True)
+F.Data.DataTable.CreateFromXML("dtXML","C:\Users\droldan\Downloads\xml_example_20250313.xml",True)
+' Check Variable.Ambient.ErrorNumber and Variable.Ambient.ErrorDescription for details
+
+
 Function.Intrinsic.Debug.InvokeDebugger
 Function.Intrinsic.Debug.Stop
 
@@ -126,7 +141,7 @@ F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
 Program.Sub.Error.End
 
 Program.Sub.Comments.Start
-${$5$}$20.1.9194.26336$}$1
-${$6$}$tsmith$}$20250313121102690$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcDSNw04ySaHX08LhyExsHN5v7nu1GfxxYY=
-${$7$}$File Version:1.1.20250313171102.0
+${$5$}$23.1.9243.18408$}$1
+${$6$}$droldan$}$20250616152630696$}$B2femnEqbLfZe6KOMlAUIUDbLEceswGWHv6wtu8ZCLKJTOJcJaC/XzpLWiC3wd4MCE7tzUUB2yc=
+${$7$}$File Version:1.1.20250616202630.1
 Program.Sub.Comments.End
