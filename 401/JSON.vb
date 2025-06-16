@@ -1,4 +1,4 @@
-﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.Start
 Program.Sub.Preflight.End
 
 Program.Sub.Main.Start
@@ -11,27 +11,37 @@ V.Local.sXPath.Declare
 V.Local.iCnt.Declare
 V.Local.sJSONString.Declare
 
-F.Communication.JSON.ParseFile("E:\ACC Courses\Avery  - Mar 2025\GAB 401\json_example.json")
+F.Communication.JSON.ParseFile("C:\Users\droldan\Downloads\GAB Training Session 4-20250313_100149-Meeting Recording\json_example.json")
 
-'F.Communication.JSON.SetProperty("XPath","/json/Property1/")
-'F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
-'F.Intrinsic.String.TrimChar(V.Local.sTemp,V.Ambient.DblQuote,V.Local.sTemp)
 
-'Read Arrays in JSON:
-F.Communication.JSON.SetProperty("XPath","/json/Property8/[1]/Property9/")
+'-----------------------------------------------READ PATHS INDIVIDUALY-----------------------------------------------
+'this is going to read Property1 
+F.Communication.JSON.SetProperty("XPath","/json/Property1/")
 F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
 F.Intrinsic.String.TrimChar(V.Local.sTemp,V.Ambient.DblQuote,V.Local.sTemp)
 
+Function.Intrinsic.Debug.InvokeDebugger
+Function.Intrinsic.Debug.STOP
+'Note you're overwriting sTemp
+
+
+'Read Arrays in JSON:
+F.Communication.JSON.SetProperty("XPath","/json/Property8/[1]/Property9/") 
+F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
+F.Intrinsic.String.TrimChar(V.Local.sTemp,V.Ambient.DblQuote,V.Local.sTemp)
+
+'What happens if the path doesn't exists? Error:
 'F.Communication.JSON.SetProperty("XPath","/json/Property8/[4]/Property9/")
 'F.Communication.JSON.ReadProperty("XText",V.Local.sTemp)
-
+'How do I just "explore" if it exist, without error? just an "in case you exist"
 'F.Communication.JSON.HasXPath("/json/Property8/[4]/Property9/",V.Local.bHasXPath)
 
-'Exercise: Loop through Array
-F.Communication.JSON.ParseFile("E:\ACC Courses\Avery  - Mar 2025\GAB 401\json_exercise.json")
+'-----------------------------------------------WHOLE FILE----------------------------------------------------------
+'Loop through Array
+F.Communication.JSON.ParseFile("C:\Users\droldan\Downloads\GAB Training Session 4-20250313_100149-Meeting Recording\json_exercise.json")
 
 V.Local.bHasXPath.Set(True)
-V.Local.iCnt.Set(1)
+V.Local.iCnt.Set(1) 'I have to set to 1 for my loop
 
 F.Intrinsic.Control.DoUntil(V.Local.bHasXPath.Not)
 	F.Intrinsic.String.Build("/json/JSONExample/[{0}]/Date/",V.Local.iCnt,V.Local.sXPath)
@@ -51,7 +61,8 @@ F.Intrinsic.Control.DoUntil(V.Local.bHasXPath.Not)
 	F.Intrinsic.Math.Add(V.Local.iCnt,1,V.Local.iCnt)
 	
 F.Intrinsic.Control.Loop
-	
+
+'in this case, after the loop ends, i want a window with the dates
 F.Intrinsic.UI.Msgbox(V.Local.sDates)
 
 F.Intrinsic.Control.Catch
@@ -75,7 +86,7 @@ F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
 Program.Sub.Error.End
 
 Program.Sub.Comments.Start
-${$5$}$20.1.9194.26336$}$1
-${$6$}$tsmith$}$20250313112032885$}$xqPbj9atw05FglvzeFsZ9cqXP+qvG6tXBpEKNTgypcBrdHugZJ6WHwFbdRTzyaRBrfSnVhnfjZs=
-${$7$}$File Version:1.1.20250313162032.0
+${$5$}$23.1.9243.18408$}$1
+${$6$}$droldan$}$20250616145624769$}$B2femnEqbLfZe6KOMlAUIUDbLEceswGWHv6wtu8ZCLKljPLjl+A6b1QzuP6oFvkBZZwjr17EC2g=
+${$7$}$File Version:1.1.20250616195624.1
 Program.Sub.Comments.End
