@@ -1,0 +1,419 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.FormITAssetInstances..Create(BaseForm)
+Gui.FormITAssetInstances..Caption("IT Asset Instances")
+Gui.FormITAssetInstances..Size(1024,720)
+Gui.FormITAssetInstances..MinX(0)
+Gui.FormITAssetInstances..MinY(0)
+Gui.FormITAssetInstances..Position(0,0)
+Gui.FormITAssetInstances..AlwaysOnTop(False)
+Gui.FormITAssetInstances..FontName("Tahoma")
+Gui.FormITAssetInstances..FontSize(8.25)
+Gui.FormITAssetInstances..ControlBox(True)
+Gui.FormITAssetInstances..MaxButton(True)
+Gui.FormITAssetInstances..MinButton(True)
+Gui.FormITAssetInstances..MousePointer(0)
+Gui.FormITAssetInstances..Moveable(True)
+Gui.FormITAssetInstances..Sizeable(True)
+Gui.FormITAssetInstances..ShowInTaskBar(True)
+Gui.FormITAssetInstances..TitleBar(True)
+Gui.FormITAssetInstances..Event(UnLoad,ExitWindow)
+Gui.FormITAssetInstances.GridITAsset.Create(GsGridControl)
+Gui.FormITAssetInstances.GridITAsset.Enabled(True)
+Gui.FormITAssetInstances.GridITAsset.Visible(True)
+Gui.FormITAssetInstances.GridITAsset.Zorder(0)
+Gui.FormITAssetInstances.GridITAsset.Size(1024,290)
+Gui.FormITAssetInstances.GridITAsset.Position(0,44)
+Gui.FormITAssetInstances.GridITAsset.Dock(0)
+Gui.FormITAssetInstances.cmd1.Create(Button)
+Gui.FormITAssetInstances.cmd1.Enabled(True)
+Gui.FormITAssetInstances.cmd1.Visible(True)
+Gui.FormITAssetInstances.cmd1.Zorder(0)
+Gui.FormITAssetInstances.cmd1.Size(75,23)
+Gui.FormITAssetInstances.cmd1.Position(725,647)
+Gui.FormITAssetInstances.cmd1.Caption("Save")
+Gui.FormITAssetInstances.cmd1.FontName("Tahoma")
+Gui.FormITAssetInstances.cmd1.FontSize(8.25)
+Gui.FormITAssetInstances.cmd2.Create(Button)
+Gui.FormITAssetInstances.cmd2.Enabled(True)
+Gui.FormITAssetInstances.cmd2.Visible(True)
+Gui.FormITAssetInstances.cmd2.Zorder(0)
+Gui.FormITAssetInstances.cmd2.Size(75,23)
+Gui.FormITAssetInstances.cmd2.Position(870,647)
+Gui.FormITAssetInstances.cmd2.Caption("")
+Gui.FormITAssetInstances.cmd2.FontName("Tahoma")
+Gui.FormITAssetInstances.cmd2.FontSize(8.25)
+Gui.FormITAssetInstances.GsAdvBandedGridControl1.Create(GsAdvBandedGridControl)
+Gui.FormITAssetInstances.GsAdvBandedGridControl1.Enabled(True)
+Gui.FormITAssetInstances.GsAdvBandedGridControl1.Visible(True)
+Gui.FormITAssetInstances.GsAdvBandedGridControl1.Size(1026,267)
+Gui.FormITAssetInstances.GsAdvBandedGridControl1.Position(-4,373)
+Gui.FormITAssetInstances.lbl1.Create(Label,"Sort Code: HRDWR",True,171,24,0,16,342,True,0,"Tahoma",15,,0,0)
+Gui.FormITAssetInstances.lbl1.BorderStyle(0)
+Gui.FormITAssetInstances.lbl2.Create(Label,"Sort Code: SFTWR",True,164,24,0,16,11,True,0,"Tahoma",15,,0,0)
+Gui.FormITAssetInstances.lbl2.BorderStyle(0)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+
+'GRID-RECEIPT
+F.Intrinsic.Control.Try
+
+	F.Intrinsic.Control.If(V.Caller.Hook, <>, "15070")
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+
+	'Initializing db
+    F.Intrinsic.Control.CallSub(InitializeDB)
+
+	V.Local.iRowCount.Declare
+	V.Local.iRowCountSQL.Declare
+	V.Local.iCnt.Declare
+	V.Local.sRow.Declare
+	V.Local.sProductAtGrid.Declare
+	V.Local.sSql.Declare(String)
+	V.Local.FlagITAssetsExist.Declare(Boolean,False)
+	V.Global.FlagHRDWR.Declare(Boolean,False)
+	V.Local.sRowCountDB.Declare(String)
+	V.Global.sPartNum.Declare(String)
+	V.Global.sProductLine.Declare(String)
+	V.Global.sSortCode.Declare(String)
+	V.Global.iITAssetID.Declare(Long,0)
+	V.Global.iITAssetIDHRDWR.Declare(Long,0)
+	V.Global.iITAssetIDSFTWR.Declare(Long,0)
+
+
+
+
+
+'=============================================VerifyPartSelected: This subroutine verifies the input=============================================
+	
+	F.Intrinsic.BDF.Load("GridReceipt",V.Passed.Grid-Receipt)
+	F.Intrinsic.BDF.Clone("GridReceipt","NewGridReceipt")
+	
+	F.Intrinsic.BDF.ReadRowCount("GridReceipt",V.Local.iRowCount)
+	F.Intrinsic.Math.Sub(V.Local.iRowCount,1,V.Local.iRowCount)
+	
+	F.Intrinsic.Control.For(V.Local.iCnt,V.Local.iRowCount)
+		F.Intrinsic.BDF.ReadRow("GridReceipt",V.Local.iCnt,V.Local.sRow)
+		'F.Intrinsic.BDF.TextMatrix("GridReceipt",1,V.Local.iCnt,V.Local.sRow) ' Reads single cell vs whole row
+		F.Intrinsic.String.Split(V.Local.sRow,"|~|",V.Local.sRow)
+		V.Global.sPartNum.Set(V.Local.sRow(1).Trim)
+		
+		'-----------IS IT HRDWR?
+		F.Intrinsic.String.Build("SELECT COUNT(*) FROM INVENTORY_MSTR WHERE Part = '{0}' AND CODE_SORT = 'HRDWR'  AND PRODUCT_LINE = 'IT'", V.Global.sPartNum, V.Local.sSql)
+		
+		F.ODBC.Connection!con.OpenCompanyConnection
+	    F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSql, V.Local.sRowCountDB)
+	    F.ODBC.Connection!con.Close
+	
+	    ' Convert string result to long
+	    V.Local.iRowCountSQL.Set(V.Local.sRowCountDB.Long)
+	
+	    F.Intrinsic.Control.If(V.Local.iRowCountSQL, >, 0)
+	    	V.Global.sSortCode.Set("HRDWR")
+	    	V.Global.FlagHRDWR.Set(True)
+	    	V.Local.FlagITAssetsExist.Set(True)
+	    	F.Intrinsic.Control.CallSub(SaveAtDt_TEMP)
+	    	F.Intrinsic.Control.Next(V.Local.iCnt)
+	    
+	    F.Intrinsic.Control.EndIf
+	    
+	    
+	    '----------IS IT SFTWR?
+	    
+		F.Intrinsic.String.Build("SELECT COUNT(*) FROM INVENTORY_MSTR WHERE Part = '{0}' AND CODE_SORT = 'SFTWR'  AND PRODUCT_LINE = 'IT'", V.Global.sPartNum, V.Local.sSql)
+		
+		F.ODBC.Connection!con.OpenCompanyConnection
+	    F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSql, V.Local.sRowCountDB)
+	    F.ODBC.Connection!con.Close
+	
+	    ' Convert string result to long
+	    V.Local.iRowCountSQL.Set(V.Local.sRowCountDB.Long)
+	
+	    F.Intrinsic.Control.If(V.Local.iRowCountSQL, >, 0)
+	    	V.Global.sSortCode.Set("SFTWR")
+	    	V.Local.FlagITAssetsExist.Set(True)
+	    	F.Intrinsic.Control.CallSub(SaveAtDt_TEMP)
+	    	F.Intrinsic.Control.Next(V.Local.iCnt)
+	    F.Intrinsic.Control.EndIf
+
+	
+	F.Intrinsic.Control.Next(V.Local.iCnt)
+	
+	'ARE THERE ANY IT ASSETS?
+	F.Intrinsic.Control.If(v.Local.FlagITAssetsExist, =, False)
+		F.Intrinsic.UI.Msgbox("There are no IT Assets")
+	    F.Intrinsic.Control.CallSub(ExitWindow)
+	F.Intrinsic.Control.EndIf
+	
+	' Create DataView from DataTable and bind to grid
+    Function.Data.DataView.Create("dtTempITAsset", "dvTempITAsset")
+    gui.FormITAssetInstances.GridITAsset.DataSource("dtTempITAsset", "dvTempITAsset")
+    F.Intrinsic.Control.CallSub(ConfigGrid, "dtTempITAsset", "dvTempITAsset")
+	
+
+	
+	
+	Gui.FormITAssetInstances..Show
+	
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"ErrorLine",V.Ambient.ErrorLine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+'==================================Data related=============================
+
+' InitializeDB: This subroutine verifies if the table exists. If it doesn't, it creates one.
+	' The table is composed by Part_Number, Serial_Number, Product_Key, IT_Asset_ID, Date_Received, Assigned_Employee, Open_tickets, Sort_Code
+Program.Sub.InitializeDB.Start
+F.Intrinsic.Control.Try
+    V.Local.bTableExists.Declare(Boolean)
+    V.Local.sSQL.Declare(String)
+
+    ' Check if CUSTOM_IT_ASSET_INSTANCES_TABLE exists
+    F.ODBC.Connection!con.OpenCompanyConnection
+    F.ODBC.Connection!con.TableExists("CUSTOM_IT_ASSET_INSTANCES_TABLE", V.Local.bTableExists)
+
+    F.Intrinsic.Control.If(V.Local.bTableExists, =, False)
+        ' Table does not exist, so create it
+        V.Local.sSQL.Set("CREATE TABLE CUSTOM_IT_ASSET_INSTANCES_TABLE (Part_Number VARCHAR(50), Serial_Number VARCHAR(50), Product_Key VARCHAR(50), IT_Asset_ID VARCHAR(50), Date_Received DATE, Assigned_Employee VARCHAR(100), Open_tickets INT, Sort_Code VARCHAR(20));")
+        F.ODBC.Connection!con.Execute(V.Local.sSQL)
+    F.Intrinsic.Control.EndIf
+
+    F.ODBC.Connection!con.Close
+
+F.Intrinsic.Control.Catch
+    F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"ErrorLine",V.Ambient.ErrorLine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.InitializeDB.End
+
+' SaveAtDt_TEMP: This subroutine saves the IT assest at a temporal dt.
+	' The table is composed by Part_Number V.Global.sPartNum, Serial_Number, Product_Key, IT_Asset_ID, Date_Received, Sort_Code V.Global.sSortCode
+	' It takes the date received date stored at v.passed.000009
+	' IT_Asset_ID_Is is a counter looking like 12
+Program.Sub.SaveAtDt_TEMP.Start
+F.Intrinsic.Control.Try
+
+
+	' Declare local variables
+	V.Local.sSQL.Declare
+	V.Local.sPartNum.Declare
+	V.Local.sSerialNum.Declare
+	V.Local.sProductKey.Declare
+	V.Local.dDateReceived.Declare
+	V.Local.sSortCode.Declare
+	
+	' Assign values from global and passed variables
+	V.Local.sPartNum.Set(v.Global.sPartNum)
+	V.Local.sSortCode.Set(v.Global.sSortCode)
+	
+	V.Local.sDateString.Declare(String)
+	V.Local.sDateString.Set(V.Passed.000009) 
+	Function.Intrinsic.Date.ConvertDString(V.Local.sDateString, "MMDDYYYY", V.Local.dDateReceived)
+
+	' Generate IT_Asset_ID as a counter
+	F.Intrinsic.Control.If(V.Global.sSortCode, =, "HRDWR")
+		F.Intrinsic.Math.Add(V.Global.iITAssetIDHRDWR,1,V.Global.iITAssetIDHRDWR)
+		V.Global.iITAssetID.Set(V.Global.iITAssetIDHRDWR)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Math.Add(V.Global.iITAssetIDSFTWR,1,V.Global.iITAssetIDSFTWR)
+		V.Global.iITAssetID.Set(V.Global.iITAssetIDSFTWR)
+	F.Intrinsic.Control.EndIf
+
+	
+	F.Intrinsic.Control.If(V.DataTable.dtTempITAsset.Exists, =, False)
+		' Create the DataTable
+		F.Data.DataTable.Create("dtTempITAsset", True)
+		
+		' Add columns with appropriate types
+		F.Data.DataTable.AddColumn("dtTempITAsset", "Part_Number", "String")
+		F.Data.DataTable.AddColumn("dtTempITAsset", "Serial_Number", "String")
+		F.Data.DataTable.AddColumn("dtTempITAsset", "Product_Key", "String")
+		F.Data.DataTable.AddColumn("dtTempITAsset", "IT_Asset_ID", "Integer")
+		F.Data.DataTable.AddColumn("dtTempITAsset", "Date_Received", "DateTime")
+		F.Data.DataTable.AddColumn("dtTempITAsset", "Sort_Code", "String")
+	F.Intrinsic.Control.EndIf
+	
+	' Add a row
+	F.Data.DataTable.AddRow("dtTempITAsset","Part_Number", V.Local.sPartNum, "Serial_Number", V.Local.sSerialNum, "Product_Key", V.Local.sProductKey,"IT_Asset_ID", V.Global.iITAssetID,"Date_Received", V.Local.dDateReceived, "Sort_Code", V.Local.sSortCode)
+	
+	
+
+F.Intrinsic.Control.Catch
+    F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"ErrorLine",V.Ambient.ErrorLine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.SaveAtDt_TEMP.End
+'============================================save at db
+
+Program.Sub.SaveButton.Start
+F.Intrinsic.Control.Try
+    ' Declare local variables
+    V.Local.sSQL.Declare(String)
+    V.Local.Index.Declare(Long,0)
+    V.Local.iRowCount.Declare(Long)
+    V.Local.SerialNumber.Declare(Long)
+    V.Local.ProductKey.Declare(String)
+    V.Local.ITAssetID.Declare(String)
+    
+	' Count rows
+	V.Local.iRowCount.Set(v.DataTable.dtIT_INV.RowCount)
+	F.Intrinsic.Math.Sub(V.Local.iRowCount, 1, V.Local.iRowCount)
+
+
+    F.Intrinsic.Control.For(V.Local.Index,0, V.Local.iRowCount,1)
+        ' Get values from the current row
+        V.Local.SerialNumber.Set(V.DataTable.dtIT_INV(V.Local.Index).Serial_Number!FieldVal)
+        V.Local.ProductKey.Set(V.DataTable.dtIT_INV(V.Local.Index).Product_Key!FieldVal)
+        V.Local.ITAssetID.Set(V.DataTable.dtIT_INV(V.Local.Index).IT_Asset_ID!FieldVal)
+
+        ' Build the SQL UPDATE statement
+        F.Intrinsic.String.Build("UPDATE CUSTOM_IT_ASSET_INSTANCES_TABLE SET Serial_Number = '{0}', Product_Key = '{1}' WHERE Part_Number ='{2}' AND  IT_Asset_ID = '{3}' AND  Sort_Code = '{4}'" , V.Local.SerialNumber, V.Local.ProductKey, V.Global.sPartNum, V.Local.ITAssetID, V.Global.sSortCode,V.Local.sSQL)
+
+
+        ' Open DB connection, execute update, close connection
+        F.ODBC.Connection!con.OpenCompanyConnection
+        F.ODBC.Connection!con.Execute(V.Local.sSQL)
+        F.ODBC.Connection!con.Close
+
+    F.Intrinsic.Control.Next(V.Local.Index)
+    
+    
+    F.Intrinsic.UI.Msgbox("Data Saved Successfully")
+F.Intrinsic.Control.Catch
+    F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"ErrorLine",V.Ambient.ErrorLine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.SaveButton.End
+
+'============================================ui
+
+Program.Sub.ConfigGrid.Start
+F.Intrinsic.Control.Try
+
+    ' Add GridView from DataView
+    gui.FormITAssetInstances.GridITAsset.AddGridviewFromDataview("gvTempITAsset", "dtTempITAsset", "dvTempITAsset")
+
+    ' Set column captions
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Part_Number", "Caption", "Part Number")
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "IT_Asset_ID", "Caption", "IT Asset ID")
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Date_Received", "Caption", "Date Received")
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Serial_Number", "Caption", "Serial Number")
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Sort_Code", "Caption", "Sort Code")
+    
+    'Set bold for headers
+    'Gui.F_Payment.GsGridControlPayment.SetColumnProperty("PaymentGrid", "TRANS", "HeaderFontBold",True)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "IT_Asset_ID", "HeaderFontBold", True)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Date_Received", "HeaderFontBold", True)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Serial_Number", "HeaderFontBold", True)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Part_Number", "HeaderFontBold", True)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Sort_Code", "HeaderFontBold", True)
+    'Align header
+    'Gui.F_Payment.GsGridControlPayment.SetColumnProperty("PaymentGrid", "TRANS", "HeaderVAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "IT_Asset_ID", "HeaderHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Date_Received", "HeaderHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Serial_Number", "HeaderHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Part_Number", "HeaderHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Sort_Code", "HeaderHAlignment", "Center")
+    'Allign cells
+    'Gui.F_Payment.GsGridControlPayment.SetColumnProperty("PaymentGrid", "TRANS", "CellHAlignment", "Near")
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "IT_Asset_ID", "CellHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Date_Received", "CellHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Serial_Number", "CellHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Part_Number", "CellHAlignment", "Center")
+	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Sort_Code", "CellHAlignment", "Center")
+
+    ' Set editable columns
+    'Gui.F_Payment.GsGridControlPayment.SetColumnProperty("PaymentGrid", "TRANS", "ReadOnly", False)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "IT_Asset_ID", "ReadOnly", True)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Date_Received", "ReadOnly", True)
+    'Gui.F_Payment.GsGridControlPayment.SetColumnProperty("PaymentGrid", "TRANS", "AllowEdit", False)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Serial_Number", "ReadOnly", False)
+    gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Serial_Number", "AllowEdit", True)
+	
+    ' Product Key only if HRDWR
+    F.Intrinsic.Control.If(v.Global.FlagHRDWR, =, True)
+        gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "Caption", "Product Key")
+        gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "ReadOnly", False)
+        gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "AllowEdit", True)
+        gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "HeaderHAlignment", "Center")
+        gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "CellHAlignment", "Center")
+        gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "HeaderFontBold", True)
+        	'f.Intrinsic.Control.CallSub(LockProductKeyForSFTWR,"gvTempITAsset")
+    F.Intrinsic.Control.Else
+    	gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Product_Key", "Visible", False)
+    F.Intrinsic.Control.EndIf
+
+	Gui.FormITAssetInstances.GridITAsset.SetGridviewProperty("gvTempITAsset", "AllowSort", True)
+
+	Gui.FormITAssetInstances.GridITAsset.SetColumnProperty("gvTempITAsset", "Sort_Code", "GroupIndex", 0)
+
+	F.Intrinsic.Control.Catch
+
+F.Intrinsic.Control.Catch
+    F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"ErrorLine",V.Ambient.ErrorLine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+
+Program.Sub.ConfigGrid.End
+
+Program.Sub.LockProductKeyForSFTWR.Start
+F.Intrinsic.Control.Try
+Function.Intrinsic.Debug.InvokeDebugger
+Function.Intrinsic.Debug.Stop
+
+	V.Local.iRowCountGV.Declare
+	
+	' Get row count
+	F.Intrinsic.BDF.ReadRowCount("gvTempITAsset", V.Local.iRowCountGV)
+	F.Intrinsic.Math.Sub(V.Local.iRowCountGV, 1, V.Local.iRowCountGV) ' Adjust for 0-based index
+	
+	' Loop through all rows
+	F.Intrinsic.Control.For(V.Local.iCnt, V.Local.iRowCountGV)
+	    ' Read the row into an array
+	    F.Intrinsic.BDF.ReadRow("gvTempITAsset", V.Local.iCnt, V.Local.sRowGV)
+	    F.Intrinsic.String.Split(V.Local.sRowGV, "|~|", V.Local.sRowSplit)
+	
+	    ' Assuming Sort_Code is at index 5
+	    If V.Local.sRowSplit(3).Trim = "SFTWR" Then
+	        ' Lock Product_key column for this row
+	        Gui.FormITAssetInstances.GridITAsset.SetCellProperty("gvTempITAsset", V.Local.iCnt, "Product_key", "ReadOnly", True)
+	    ElseIf V.Local.sRowSplit(3).Trim = "HRDWR" Then
+	        ' Make Product_key column editable for this row
+	        Gui.FormITAssetInstances.GridITAsset.SetCellProperty("gvTempITAsset", V.Local.iCnt, "Product_key", "ReadOnly", False)
+	    End If
+	F.Intrinsic.Control.Next(V.Local.iCnt)
+
+F.Intrinsic.Control.Catch
+    F.Intrinsic.Control.CallSub(Error,"SubRoutine",V.Ambient.CurrentSubroutine,"ErrorLine",V.Ambient.ErrorLine,"eNumber",V.Ambient.ErrorNumber,"eDescription",V.Ambient.ErrorDescription)
+F.Intrinsic.Control.EndTry
+Program.Sub.LockProductKeyForSFTWR.End
+
+'===========================================Exit and error==========================
+
+Program.Sub.ExitWindow.Start
+F.Intrinsic.Control.End
+Program.Sub.ExitWindow.End
+
+
+
+Program.Sub.Error.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+V.Local.sSep.Declare
+V.Local.sScript.Declare
+
+F.Intrinsic.String.Split(V.Caller.ScriptFile,"\",V.Local.sScript)
+V.Local.sScript.Set(V.Local.sScript(V.Local.sScript.UBound))
+V.Local.sScript.RedimPreserve(0,0)
+
+F.Intrinsic.String.Build("-------------------------------------------------------------------------------------",,V.Local.sSep)
+F.Intrinsic.String.Build("{5} {6}{0}{7}{0}Project: {4}{0}{7}{0}Sub: {1}{0}Line:{8}{0}Error: {2}, {3}", V.Ambient.NewLine, V.Args.SubRoutine, V.Args.eNumber, V.Args.eDescription,V.Local.sScript,V.Ambient.Date, V.Ambient.Time,V.Local.sSep,V.Args.ErrorLine,V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError,"Error",V.Local.iRet)
+Program.Sub.Error.End
+
+Program.Sub.Comments.Start
+${$5$}$23.1.9243.18408$}$1
+${$6$}$droldan$}$20250630161136768$}$B2femnEqbLfZe6KOMlAUIUDbLEceswGWHv6wtu8ZCLKo0HW3QAgPPNgqm9ZmP5KO73URr2XgPKY=
+${$7$}$File Version:1.1.20250630211136.0
+Program.Sub.Comments.End
